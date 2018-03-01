@@ -9,21 +9,39 @@ hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
 
 2. `ln -s <this-repo-full-path> <your-ns3-full-path>/examples/main`
 
-3. add the following code in your `~\.bashrc` or `~\.zshrc`
+3. add the following code in your `~\.zshrc` or `~\.bashrc`
 
    ```shell
    # Waf section
    WAF_PATH=/home/lab1112/workspace/bake/source/ns-3.27
    export PATH=$WAF_PATH:$PATH
+
+   function wafls() {
+   	ls $WAF_PATH/$1
+   }
+
+   function wafcd() {
+   	cd $WAF_PATH/$1
+   }
+
+   function wafed() {
+   	gedit $WAF_PATH/$1
+   }
+
+   function wafbuild() {
+   	local pwd_tmp=$PWD
+   	cd $WAF_PATH &&	waf && cd $pwd_tmp
+   }
+
    function wafrun() {
    	local pwd_tmp=$PWD
-   	cd $WAF_PATH &&	waf --run=$1 &&	cd $pwd_tmp
+   	cd $WAF_PATH &&	waf --run $1 && cd $pwd_tmp
    }
    ```
 
    `source` the configuration file
 
-4. `wafrun main` to run the simulation
+4. `wafbuild && wafrun main` to run the simulation
 
 ### Todo
 
