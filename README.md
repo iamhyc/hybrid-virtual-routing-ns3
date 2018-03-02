@@ -9,7 +9,7 @@ hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
 
 2. `ln -s <this-repo-full-path> <your-ns3-full-path>/examples/main`
 
-3. add the following code in your `~\.zshrc` or `~\.bashrc`
+3. add the following code in your `~/.zshrc` or `~/.bashrc`
 
    ```shell
    # Waf section
