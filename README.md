@@ -15,27 +15,37 @@ hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
    # Waf section
    WAF_PATH=<your-ns3-full-path>
    export PATH=$WAF_PATH:$PATH
+   _editor_check() { echo `whereis $1 | awk '{print $2}'`}
 
    function wafls() {
-   	ls $WAF_PATH/$1
+   	ls $WAF_PATH/$1 ${${*}#${1}}
    }
 
    function wafcd() {
-   	cd $WAF_PATH/$1
+   	cd $WAF_PATH/$1 ${${*}#${1}}
    }
 
    function wafed() {
-   	gedit $WAF_PATH/$1
+   	local PARAM=${${*}#${1}}
+   	if [ -n `_editor_check "subl"` ]; then
+   		subl $WAF_PATH/$1 $PARAM
+   	elif [ -n `_editor_check "gedit"` ]; then
+   		gedit $WAF_PATH/$1 $PARAM
+   	elif [ -n `_editor_check "nano"` ]; then
+   		nano $WAF_PATH/$1 $PARAM
+   	elif [ -n `_editor_check "vi"` ]; then
+   		nano $WAF_PATH/$1 $PARAM
+   	fi
    }
 
    function wafbuild() {
    	local pwd_tmp=$PWD
-   	cd $WAF_PATH &&	waf && cd $pwd_tmp
+   	cd $WAF_PATH &&	./waf && cd $pwd_tmp
    }
 
    function wafrun() {
    	local pwd_tmp=$PWD
-   	cd $WAF_PATH &&	waf --run $1 && cd $pwd_tmp
+   	cd $WAF_PATH &&	waf --run $* && cd $pwd_tmp
    }
    ```
 

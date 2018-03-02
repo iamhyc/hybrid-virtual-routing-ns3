@@ -1,10 +1,12 @@
-
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
-{Node, Channel, Device, Stack, Address, Interface, Service, Application}
-Stack -->Node
-Channel -->Node = DeviceContainer
-Service -->Node = ApplicationContainer
-*/
+ * Mark@Lab1112, EEE, SUSTech
+ */
+
+// {Node, Channel, Device, Stack, Address, Interface, Service, Application}
+// Stack -->Node
+// Channel -->Node = DeviceContainer
+// Service -->Node = ApplicationContainer
 
 #include "ns3/core-module.h"
 #include "ns3/wifi-module.h"
@@ -19,23 +21,30 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("HybridVirtualRouting");
 
+/*Global Static Configuration*/
+static NodeContainer nodes;
+static PointToPointHelper pointToPoint;
+static NetDeviceContainer devices;
+
 int main(int argc, char *argv[])
 {
+  bool verbose = false; 
+
   /* Command Parameter Parse */
   CommandLine cmd;
+  cmd.AddValue ("verbose", "Tell echo applications to log if true", verbose);
   cmd.Parse (argc, argv);
 
   /* 1.Node Container Setup */
-  NodeContainer nodes;
   nodes.Create (2);
 
   /* 2.Channel Helper Setup */
-  PointToPointHelper pointToPoint;
+  //p2p channel
   pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  //wifi channel, {Area, Numbers, Range, Mobility, Loss, Delay}
 
   /* 1+2 Channel->Node */
-  NetDeviceContainer devices;
   devices = pointToPoint.Install (nodes);
 
   /* 3.Internet Stack Install */
@@ -64,8 +73,11 @@ int main(int argc, char *argv[])
 
   /* 5.Simulator Setup */
   Time::SetResolution (Time::NS);
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  if (verbose)
+  {
+    LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+    LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  }
 
   /* Run Simulator */
   Simulator::Run ();
