@@ -34,7 +34,7 @@ hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
    	elif [ -n `_editor_check "nano"` ]; then
    		nano $WAF_PATH/$1 $PARAM
    	elif [ -n `_editor_check "vi"` ]; then
-   		nano $WAF_PATH/$1 $PARAM
+   		vi $WAF_PATH/$1 $PARAM
    	fi
    }
 
