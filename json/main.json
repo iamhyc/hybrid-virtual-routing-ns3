@@ -1,0 +1,73 @@
+{
+	"__topology_layer__": ["inter (interconnect)", "intra (to next layer)"],
+	"topology": {
+		"device-router": {
+			"inter_ipBase_csma": "10.1.0.0",
+			"intra_ipBase_wifi": "10.2.%1.0",
+			"intra_wifi_ssid": "router_%1",
+			"intra_ipBase_p2p": "10.3.%1.%2",
+			"device-relay": {
+				"intra_ipBase_wifi": "127.%1.%2.0",
+				"intra_wifi_ssid": "relay_%1_%2",
+				"device-client": null
+			}
+		}
+	},
+
+	"physical": {
+		"csma_throughput": "1000Mbps",
+		"csma_delay": "2ms",
+
+		"router_number": 2,
+		"router_config": [{
+				"wifi_config": {
+					"mobility": [0, 5, 0, 0],
+					"channel": 1,
+					"bandwidth": 20,
+					"standard": "802.11ac"
+				},
+				"p2p_config": {
+					"throughput": "20Mbps",
+					"p2p_delay": "2ms",
+				},
+
+				"relay_number": 1,
+				"relay_config": [{
+					"wifi_config": {
+						"mobility": [0, 5, 0, 0],
+						"channel": 1,
+						"bandwidth": 20,
+						"standard": "802.11ac"
+					}
+				}]
+			},
+
+			{
+				"wifi_config": {
+					"mobility": [0, -5, 0, 0],
+					"channel": 6,
+					"bandwidth": 20,
+					"standard": "802.11ac"
+				},
+				"p2p_config": {
+					"throughput": "20Mbps",
+					"p2p_delay": "2ms",
+				},
+
+				"relay_number": 1,
+				"relay_config": [{
+					"wifi_config": {
+						"mobility": [0, -5, 0, 0],
+						"channel": 6,
+						"bandwidth": 20,
+						"standard": "802.11ac"
+					}
+				}]
+			}
+		]
+	},
+
+	"application": {
+
+	}
+}

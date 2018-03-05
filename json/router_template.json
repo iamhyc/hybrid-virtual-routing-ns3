@@ -1,0 +1,17 @@
+{
+	"router_config": [{
+			"wifi_config": {
+				"mobility": [0, 5, 0, 0],
+				"channel": 1,
+				"bandwidth": 20,
+				"standard": "802.11ac"
+			},
+			"p2p_config": {
+				"throughput": "20Mbps",
+				"p2p_delay": "2ms",
+			},
+
+			"relay_number": "$NUMBER",
+			"relay_config": "$INCLUDE 'relay_template.json'$"
+		}]
+}
