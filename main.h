@@ -13,38 +13,50 @@
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
 
-uint8_t p2pAddressMask[8] = [127, 191, 223, 239, 247, 251, 253, 254];
+#include "rapidjson/istreamwrapper.h"
+#include "rapidjson/document.h"
+#include "rapidjson/pointer.h"
 
-class RouterClass
+static const char* kTypeNames[] = 
+	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
+void printDocument(char const *name="", Value const *doc=0, int layer=0);
+
+namespace ns_net
 {
-public:
-	RouterClass();
-	~RouterClass();
-	NodeContainer routerNodes;
-};
+	const char* p2pAddressMask[8] = { 127, 191, 223, 239, 247, 251, 253, 254 };
+	const char* kChannelNames[] = { "csma", "wifi", "p2p" };
 
-class RelayGroup
-{
-public:
-	RelayGroup();
-	~RelayGroup();
-	int addRelayNode();
-	int addStationNode();
+	class RouterClass
+	{
+	public:
+		RouterClass();
+		~RouterClass();
+		NodeContainer routerNodes;
+	};
 
-private:
-	NodeContainer relayNodes;
-	NodeContainer staNodes;
-};
+	class RelayGroup
+	{
+	public:
+		RelayGroup();
+		~RelayGroup();
+		int addRelayNode();
+		int addStationNode();
 
-class gConfig
-{
-public:
-	gConfig();
-	~gConfig();
+	private:
+		NodeContainer relayNodes;
+		NodeContainer staNodes;
+	};
 
-private:
-	bool verbose;
-	
-};
+	class gConfig
+	{
+	public:
+		gConfig();
+		~gConfig();
+
+	private:
+		bool verbose;
+		
+	};
+}
 
 #endif
