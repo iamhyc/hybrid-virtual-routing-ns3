@@ -1,9 +1,12 @@
 ## NS3 Simulation
 
-hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
+hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
+
+### Framework
+
+* describe the network from-top-to-bottom in JSON format, self-recursive and iterable
 
 ### Howto
-
 
 1. build ns3 following official course;
 
@@ -50,6 +53,7 @@ hybrid-virtual-routing, for VLC-RF Backend Wi-Fi Relay Network
 4. `wafbuild && wafrun main` to run the simulation
 
 ### Todo
-
-- [ ] CLICK router (?)
-- [ ] Wi-Fi Collision
+- [ ] Network JSON Parse
+- [ ] Static Routing Strategy
+- [ ] Performance Analysis Callback
+- [ ] Wi-Fi Collision Container
