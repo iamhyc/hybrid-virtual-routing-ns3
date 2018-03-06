@@ -67,83 +67,39 @@ void printDocument(char const *name="", Value const *doc=0, int layer=0)
 	return;
 }
 
-void nodesInit()
-{
-	// //init P2P nodes
-	// p2pNodes.Create(2);
-	// // init CSMA nodes
-	// csmaNodes.Add (p2pNodes.Get(1));
-	// csmaNodes.Create (3);
-	// // init wifi nodes
-	// wifiApNode = p2pNodes.Get (0);
-	// wifiStaNodes.Create(3);
-}
+/*using ns3::NodeContainer
+Create(); Add(); Get();
 
-void topologyInit()
-{
-	// //p2p channel
-	// pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-	// pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
-	// /* 1+2 Channel->Node */
-	// p2pDevices = pointToPoint.Install (p2pNodes);
-	// //wifi channel, {Area, Numbers, Range, Mobility, Loss, Delay}
-}
+helper.Install(NodeContainer);
+//wifi channel, {Area, Numbers, Range, Mobility, Loss, Delay}
 
-void networkInit()
-{
-	// // for p2p device
-	// stack.Install (p2pNodes);
-	// address.SetBase ("192.168.3.0", "255.255.255.0");
-	// p2pInterfaces = address.Assign (p2pDevices);
-	// // for csma device
-	// stack.Install (csmaNodes);
-	// // for wifi device
-	// stack.Install (wifiApNode);
-	// stack.Install (wifiStaNodes);
-}
+stack.install(NodeContainer)
+address.setBase("Interface", "NetMask");
+address.Assign(NetDeviceContainer);*/
 
 int main(int argc, char *argv[])
 {
 	/* Global Static Configuration */
-	//interconnect with CSMA, equipped with WiFi-AP and P2P
-	static RouterClass routerNodes;
-	//interconnect with Wi-Fi Sta, equipped with P2P
-	static RelayGroup relayGroup(routerNodes);
+	bool verbose;
 	
 	/* Command Parameter Parse */
 	CommandLine cmd;
 	cmd.Parse (argc, argv);
 
+	//interconnect with CSMA, equipped with WiFi-AP and P2P
+	//interconnect with Wi-Fi Sta, equipped with P2P
 	/* 1.Node Container Setup */
-	nodesInit();
 	/* 2.Channel Helper Setup */
-	topologyInit();
 	/* 3.Internet Stack Install */
-	networkInit();
-
 	/* 4.Application Install */
-	/*UdpEchoServerHelper echoServer (9);
-
-	ApplicationContainer serverApps = echoServer.Install (p2pNodes.Get (1));
-	serverApps.Start (Seconds (1.0));
-	serverApps.Stop (Seconds (10.0));
-
-	UdpEchoClientHelper echoClient (p2pInterfaces.GetAddress (1), 9);
-	echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
-	echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-	echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-
-	ApplicationContainer clientApps = echoClient.Install (p2pNodes.Get (0));
-	clientApps.Start (Seconds (2.0));
-	clientApps.Stop (Seconds (10.0));*/
 
 	/* 5.Simulator Setup */
-	Time::SetResolution (Time::NS);
+	Time::SetResolution(Time::NS);
 	if (verbose)
 	{
-		pointToPoint.EnablePcapAll("main-p2p");
-		LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-		LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+		// pointToPoint.EnablePcapAll("main-p2p");
+		// LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+		// LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
 	}
 
 	/* Run Simulator */

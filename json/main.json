@@ -1,22 +1,32 @@
 {
-	"__topology_layer__": ["inter (interconnect)", "intra (to next layer)"],
+	"__topology_layer__": ["inter_subnet1_subnet2", "intra_net_subnet"],
 	"topology": {
-		"inter_ipBase_csma": "10.1.0.0",
+		"device-root": false,
+		"inter_root_router": {},
+		"inter_self_router": {
+			"ipbase_csma": "10.1.0.0"
+		},
 		"device-router": {
-			"intra_ipBase_wifi": "10.2.%1.0",
-			"intra_wifi_ssid": "router_%1",
-			"intra_ipBase_p2p": "10.3.%1.%2",
+			"intra_relay": {
+				"wifi_ssid": "router_%1",
+				"ipBase_wifi": "10.2.%1.0",
+				"ipBase_p2p": "10.3.%1.%2"
+			},
 			"device-relay": {
-				"intra_ipBase_wifi": "127.%1.%2.0",
-				"intra_wifi_ssid": "relay_%1_%2",
+				"intra_client": {
+					"wifi_ssid": "relay_%1_%2",
+					"ipBase_wifi": "127.%1.%2.0"
+				},
 				"device-client": {}
 			}
 		}
 	},
 
 	"physical": {
-		"csma_throughput": "1000Mbps",
-		"csma_delay": "2ms",
+		"csma_config": {
+			"throughput": "1000Mbps",
+			"delay": "2ms"
+		},
 
 		"router_number": 2,
 		"router_config": [{
