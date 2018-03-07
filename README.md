@@ -19,7 +19,6 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
    WAF_PATH=<your-ns3-full-path>
    WAF_EDITOR=<your-prefer-editor>
    export PATH=$WAF_PATH:$PATH
-   _editor_check() { echo `whereis $1 | awk '{print $2}'`}
 
    function wafls() {
    	ls $WAF_PATH/$1 ${${*}#${1}}
