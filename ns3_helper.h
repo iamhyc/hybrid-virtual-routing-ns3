@@ -13,14 +13,15 @@
 namespace ns3_helper
 {
 	// channel helper
-	PointToPointHelper pointToPoint;
-	CsmaHelper csma;
-	WifiHelper wifi;
-	WifiMacHelper mac;
-	MobilityHelper mobility;
+	static PointToPointHelper p2p;
+	static CsmaHelper csma;
+	/*wifi channel: {Area, Numbers, Range, Mobility, Loss, Delay}*/
+	static WifiHelper wifi;
+	static WifiMacHelper wifi_mac;
+	static MobilityHelper mobility;
 	// service helper
-	InternetStackHelper stack;
-	Ipv4AddressHelper address;
+	static InternetStackHelper stack;
+	static Ipv4AddressHelper address;
 }
 
 #endif

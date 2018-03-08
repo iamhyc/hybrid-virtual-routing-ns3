@@ -8,10 +8,14 @@ def build(bld):
 		"main.cc"
 	]
 
+	obj = bld.create_ns3_program('build-tree', 
+		['core', 'network', 'stats', 'point-to-point', 'csma', 'wifi', 'internet', 'applications'])
+	obj.source = "build-tree.cc"
+
 	headers = bld(features='ns3header')
 	headers.module = 'hvr-main'
 	headers.source = [
-		"main.h",
+		"ns3_net",
 		"ns3_helper.h",
 		"ns3_perf.h",
 		"include/rapidjson/pointer.h"
