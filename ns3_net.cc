@@ -6,7 +6,9 @@ using namespace rapidjson;
 
 bool documentLint(rapidjson::Document const *json)
 {
-	//UNUSED(json);
+	assert(*json["topology"].IsObject());
+	assert(*json["physical"].IsObject());
+	assert(*json["application"].IsObject());
 	return true;
 }
 
@@ -42,8 +44,38 @@ void printDocument(char const *name="", Value const *doc=0, int layer=0)
 	return;
 }
 
+void findMemberName(rapidjson::Value const *doc, const std::string name, std::vector<std::string> &output)
+{
+	for(auto& m : doc->GetObject())
+	{
+		string tmp(m.name.GetString());
+		if (tmp.find(name) != std::string::npos)
+		{
+			output.push_bask(tmp);
+		}
+	}
+}
+
+NetRootTree::NetRootTree(const char *path)
+{
+	ifstream ifs("json/main.json", fstream::in);
+	IStreamWrapper isw(ifs);
+	Document json;
+
+	auto flag = json.ParseStream(isw).HasParseError();
+	assert(flag == 0);
+	documentLint(&json); //use assert
+
+	NetRootTree(&json);
+}
+
 NetRootTree::NetRootTree(rapidjson::Document const *json)
 {
+	Value* topology = GetValueByPointer(*json, "/topology");
+	Value* physical = GetValueByPointer(*json, "/physical");
+	Value* application = GetValueByPointer(*json, "/application");
+
+	/*iterate for (NetRootTree *next) here*/
 
 }
 

@@ -36,21 +36,21 @@ NS_LOG_COMPONENT_DEFINE ("HybridVirtualRouting");
 int main(int argc, char *argv[])
 {
 	/* Command Parameter Parse */
-	bool verbose;
+	bool quiet = false;
 	CommandLine cmd;
-	cmd.AddValue("verbose", "Tell echo applications to log if true", verbose);
+	cmd.AddValue("quiet", "Tell echo applications to log if true", quiet);
 	cmd.Parse(argc, argv);
 
 	/* 5.Simulator Setup */
 	Time::SetResolution(Time::NS);
-	if (verbose)
+	if (!quiet)
 	{
 		// ChannelHelper.EnablePcapAll("main");
 		// LogComponentEnable("UdpApplication", LOG_LEVEL_INFO);
 	}
 
 	/* Run Simulator */
-	Simulator::Run (); // paralleled thread running later
-	Simulator::Destroy ();
+	Simulator::Run(); // paralleled thread running later
+	Simulator::Destroy();
 	return 0;
 }
