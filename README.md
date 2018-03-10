@@ -6,6 +6,28 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 
 * describe the network from-top-to-bottom in JSON format, self-recursive and iterable
 
+* Demo
+
+  ```mermaid
+  graph TB
+  	subgraph GroupB
+  		A1[Router1]-.VLC.->B1_0[Relay_1_0]
+  		B1_0-.WiFi.->A1
+  		A1-.VLC.->B1_1[Relay_1_1]
+  		B1_1-.WiFi.->A1
+  	end
+  	subgraph GroupA
+  		A0[Router0]-.VLC.->B0_0[Relay_0_0]
+  		B0_0-.WiFi.->A0
+  		A0-.VLC.->B0_1[Relay_0_1]
+  		B0_1-.WiFi.->A0
+  	end
+  	B0_0---C0[UE Group]
+  	B0_1---C1[UE Group]
+  	B1_0---C2[UE Group]
+  	B1_1---C3[UE Group]
+  ```
+
 ### Howto
 
 1. build ns3 following official course;
