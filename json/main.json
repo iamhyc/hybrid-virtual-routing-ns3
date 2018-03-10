@@ -1,5 +1,5 @@
 {
-	"__topology_layer__": ["inter_subnet1_subnet2", "intra_net_subnet"],
+	"__topology_layer__": ["inter_subnet1_subnet2", "intra_net_subnet", "outer_net_callbackNet"],
 	"topology": {
 		"device-root": false,
 		"inter_root_router": {},
