@@ -21,18 +21,6 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("HybridVirtualRouting");
 
-/* {Node, Channel, Device, Stack, Address, Interface, Service, Application}
- * // 1.Node Container Setup
- * using ns3::NodeContainer
- * Create(); Add(); Get();
- * // 2.Channel Helper Setup
- * helper.Install(NodeContainer);
- * // 3.Internet Stack Install
- * stack.install(NodeContainer)
- * address.setBase("Interface", "NetMask");
- * address.Assign(NetDeviceContainer);
- * // 4.Application Install
-*/
 int main(int argc, char *argv[])
 {
 	/* Command Parameter Parse */
@@ -41,7 +29,21 @@ int main(int argc, char *argv[])
 	cmd.AddValue("quiet", "Tell echo applications to log if true", quiet);
 	cmd.Parse(argc, argv);
 
-	/* 5.Simulator Setup */
+	/* {Node, Channel, Device, Stack, Address, Interface, Service, Application}
+	 * // 0.Set default attributes and random seed
+	 * // 1.Node Container Setup
+	 * 		using ns3::NodeContainer
+	 * 		Create(); Add(); Get();
+	 * // 2.Channel Helper Setup
+	 * 		helper.Install(NodeContainer);
+	 * // 3.Internet Stack Install
+	 * 		stack.install(NodeContainer)
+	 * 		address.setBase("Interface", "NetMask");
+	 * 		address.Assign(NetDeviceContainer);
+	 * // 4.Application Install
+	 * // 5.Connect trace sources and sinks
+	*/
+	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);
 	if (!quiet)
 	{
