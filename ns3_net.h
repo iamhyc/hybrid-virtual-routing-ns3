@@ -3,21 +3,24 @@
 #define __NS3_NET_H__
 
 #include "ns3/core-module.h"
+#include "ns3/network-module.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/document.h"
-#include "rapidjson/pointer.h"
+// #include "rapidjson/pointer.h"
 
 #include <fstream>
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
-static const char* kTypeNames[] = 
+using namespace std;
+
+const char* kTypeNames[] = 
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name="", rapidjson::Value const *doc=0, int layer=0);
 
-void findMemberName(rapidjson::Value const *, const string name, std::vector<std::string> *); //with wildcard
-void getNameBySplitter(const char* message, const char* splitter, std::vector<std::string> &tokens)
+void findMemberName(rapidjson::Value const *, const string name, vector<string> *); //with wildcard
+void getNameBySplitter(const char* message, const char* splitter, vector<string> &tokens)
 {
 	/*e.g. getNamebySplitter("ipBase", "_", tokens); ("device", "-", tokens)*/
 	boost::split(tokens, message, boost::is_any_of(splitter));
@@ -25,14 +28,14 @@ void getNameBySplitter(const char* message, const char* splitter, std::vector<st
 
 namespace ns3_net
 {
-	const char* p2pAddressMask[8] = { 127, 191, 223, 239, 247, 251, 253, 254 };
+	const int p2pAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 	const char* kChannelNames[] = { "csma", "wifi", "p2p" };
 
 	typedef struct wifiSchema
 	{
 		char* ssid;
 		char* standard;//IEEE 802.11
-		int[4] mobility;
+		int mobility[4];
 		int channel;
 		int bandwidth;
 	}wifiSchema_t;
@@ -48,13 +51,13 @@ namespace ns3_net
 	public:
 		NetRootTree(rapidjson::Document);
 		~NetRootTree();
-		static const *NetRootTree getByGroupName(const *NetRootTree, const char *);
+		static const NetRootTree* getByGroupName(const NetRootTree*, const char *);
 		string getName();
 		NetRootTree *getNext();
 
 	private:
 		string GroupName;
-		ns3::NodesContainner group;
+		ns3::NodeContainer group;
 		NetRootTree *next;
 	};
 
