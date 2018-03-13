@@ -2,19 +2,19 @@
 
 def build(bld):
 	# The main struct of the simulation
-	obj = bld.create_ns3_program('hvr-main', 
+	obj = bld.create_ns3_program('main', 
 		['core', 'network', 'stats', 'point-to-point', 'csma', 'wifi', 'internet', 'applications'])
 	obj.source = [
 		"main.cc"
 	]
 
 	headers = bld(features='ns3header')
-	headers.module = 'hvr-main'
+	headers.module = 'main'
 	headers.source = [
 		"ns3_net.h",
 		"ns3_helper.h",
 		"ns3_perf.h",
-		# "include/rapidjson/pointer.h",
+		"include/rapidjson/pointer.h",
 		"include/rapidjson/document.h",
 		"include/rapidjson/istreamwrapper.h",
 	]

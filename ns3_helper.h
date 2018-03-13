@@ -13,6 +13,7 @@
 namespace ns3_helper
 {
 	using namespace ns3;
+	
 	// channel helper
 	static PointToPointHelper p2p;
 	static CsmaHelper csma;

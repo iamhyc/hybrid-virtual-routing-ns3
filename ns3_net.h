@@ -28,6 +28,8 @@ void getNameBySplitter(const char* message, const char* splitter, vector<string>
 
 namespace ns3_net
 {
+	using namespace ns3;
+
 	const int p2pAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 	const char* kChannelNames[] = { "csma", "wifi", "p2p" };
 
@@ -57,7 +59,7 @@ namespace ns3_net
 
 	private:
 		string GroupName;
-		ns3::NodeContainer group;
+		NodeContainer group;
 		NetRootTree *next;
 	};
 
