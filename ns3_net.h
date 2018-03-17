@@ -4,9 +4,9 @@
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "rapidjson/istreamwrapper.h"
-#include "rapidjson/document.h"
-#include "rapidjson/pointer.h"
+#include "include/rapidjson/istreamwrapper.h"
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/rapointer.h"
 
 #include <fstream>
 #include <vector>
@@ -14,24 +14,19 @@
 
 using namespace std;
 
-const char* kTypeNames[] = 
-	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
+extern const char* kTypeNames[];
 bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
 void findMemberName(rapidjson::Value const *, const string name, vector<string> *); //with wildcard
-void getNameBySplitter(const char* message, const char* splitter, vector<string> &tokens)
-{
-	/*e.g. getNamebySplitter("ipBase", "_", tokens); ("device", "-", tokens)*/
-	boost::split(tokens, message, boost::is_any_of(splitter));
-}
+void getNameBySplitter(char const *, char const *, vector<string> &);
 
 namespace ns3_net
 {
 	using namespace ns3;
 
 	const int p2pAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
-	const char* kChannelNames[] = { "csma", "wifi", "p2p" };
+	extern const char* kChannelNames[];
 
 	typedef struct wifiSchema
 	{
@@ -52,9 +47,8 @@ namespace ns3_net
 	{
 	public:
 		NetRootTree(char const *path);
-		NetRootTree(rapidjson::Document const &);
 		~NetRootTree();
-		static const NetRootTree *getByGroupName(const NetRootTree*, char const *);
+		// static const NetRootTree *getByGroupName(const NetRootTree*, char const *);
 		string getName();
 		NetRootTree const *getNext();
 

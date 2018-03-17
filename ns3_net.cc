@@ -1,8 +1,15 @@
 
 #include "ns3_net.h"
 
-using namespace ns3_net;
 using namespace rapidjson;
+const char* kTypeNames[] = 
+	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
+
+void getNameBySplitter(char const *message, char const *splitter, vector<string> &tokens)
+{
+	/*e.g. getNamebySplitter("ipBase", "_", tokens); ("device", "-", tokens)*/
+	boost::split(tokens, message, boost::is_any_of(splitter));
+}
 
 bool documentLint(rapidjson::Document const &json)
 {
@@ -15,7 +22,7 @@ bool documentLint(rapidjson::Document const &json)
 void printDocument(char const *name="", Value const *doc=0, int layer=0)
 {
 	string m_indent(layer, '\t');
-	if (!string(name).compare(""))
+	if (string(name).compare(""))
 	{
 		printf("%s%s: \n", m_indent.c_str(), name);
 	}
@@ -56,27 +63,38 @@ void findMemberName(rapidjson::Value const *doc, const std::string name, std::ve
 	}
 }
 
+using namespace ns3_net;
+const char* kChannelNames[] = { "csma", "wifi", "p2p" };
+
+NetRootTree::~NetRootTree()
+{
+
+}
+
 NetRootTree::NetRootTree(char const *path)
 {
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
-	Document json;
+	rapidjson::Document json;
 
 	auto flag = json.ParseStream(isw).HasParseError();
 	assert(flag == 0);
 	documentLint(json); //use assert
 
-	// NetRootTree(json);
-}
-
-NetRootTree::NetRootTree(rapidjson::Document const &json)
-{
-	// Value* topology = GetValueByPointer(json, "/topology");
-	// Value* physical = GetValueByPointer(json, "/physical");
-	// Value* application = GetValueByPointer(json, "/application");
+	Value* topology = GetValueByPointer(json, "/topology");
+	Value* physical = GetValueByPointer(json, "/physical");
+	Value* application = GetValueByPointer(json, "/application");
 
 	/*iterate for (NetRootTree *next) here*/
+	assert(topology->IsObject());
+	assert(physical->IsObject());
+	assert(application->IsObject());
 
+	printDocument("topology", topology);
+	printDocument("physical", physical);
+	printDocument("application", application);
+
+	// cout << topology->HasMember("device-router") << endl;
 }
 
 string NetRootTree::getName()
@@ -89,7 +107,7 @@ NetRootTree const *NetRootTree::getNext()
 	return next;
 }
 
-static const NetRootTree *NetRootTree::getByGroupName(const NetRootTree *root, char const *name)
+/*static const NetRootTree *NetRootTree::getByGroupName(const NetRootTree *root, char const *name)
 {
 	const NetRootTree *iter = root;
 	while(root != NULL)
@@ -100,3 +118,4 @@ static const NetRootTree *NetRootTree::getByGroupName(const NetRootTree *root, c
 			iter = root->getNext();
 	}
 }
+*/

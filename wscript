@@ -5,7 +5,7 @@ def build(bld):
 	obj = bld.create_ns3_program('main', 
 		['core', 'network', 'stats', 'point-to-point', 'csma', 'wifi', 'internet', 'applications'])
 	obj.source = [
-		"main.cc", "ns3_net.cc", "ns3_helper.cc", "ns3_perf.cc",
+		"main.cc", "ns3_net.cc", "ns3_helper.cc", "ns3_perf.cc"
 	]
 
 	headers = bld(features='ns3header')
@@ -14,6 +14,7 @@ def build(bld):
 		"ns3_net.h",
 		"ns3_helper.h",
 		"ns3_perf.h",
+		"include/rapidjson/rapointer.h",
 		"include/rapidjson/document.h",
 		"include/rapidjson/istreamwrapper.h",
 	]

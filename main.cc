@@ -12,7 +12,6 @@
  */
 #include <iostream>
 
-/*#include "main.h"*/
 #include "ns3_net.h"
 #include "ns3_helper.h"
 #include "ns3_perf.h"
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
 	 * // 4.Application Install
 	 * // 5.Connect trace sources and sinks
 	*/
-	ns3_net::NetRootTree rt("./json/main.json");
+	ns3_net::NetRootTree rt("/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json");
 
 	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);
