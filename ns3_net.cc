@@ -4,18 +4,18 @@
 using namespace ns3_net;
 using namespace rapidjson;
 
-bool documentLint(rapidjson::Document const *json)
+bool documentLint(rapidjson::Document const &json)
 {
-	assert(*json["topology"].IsObject());
-	assert(*json["physical"].IsObject());
-	assert(*json["application"].IsObject());
+	assert(json["topology"].IsObject());
+	assert(json["physical"].IsObject());
+	assert(json["application"].IsObject());
 	return true;
 }
 
 void printDocument(char const *name="", Value const *doc=0, int layer=0)
 {
 	string m_indent(layer, '\t');
-	if (name != "")
+	if (!string(name).compare(""))
 	{
 		printf("%s%s: \n", m_indent.c_str(), name);
 	}
@@ -51,51 +51,50 @@ void findMemberName(rapidjson::Value const *doc, const std::string name, std::ve
 		string tmp(m.name.GetString());
 		if (tmp.find(name) != std::string::npos)
 		{
-			output.push_bask(tmp);
+			output.push_back(tmp);
 		}
 	}
 }
 
-NetRootTree::NetRootTree(const char *path)
+NetRootTree::NetRootTree(char const *path)
 {
-	ifstream ifs("json/main.json", fstream::in);
+	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
 	Document json;
 
 	auto flag = json.ParseStream(isw).HasParseError();
 	assert(flag == 0);
-	documentLint(&json); //use assert
+	documentLint(json); //use assert
 
-	NetRootTree(&json);
+	// NetRootTree(json);
 }
 
-NetRootTree::NetRootTree(rapidjson::Document const *json)
+NetRootTree::NetRootTree(rapidjson::Document const &json)
 {
-	Value* topology = GetValueByPointer(*json, "/topology");
-	Value* physical = GetValueByPointer(*json, "/physical");
-	Value* application = GetValueByPointer(*json, "/application");
+	// Value* topology = GetValueByPointer(json, "/topology");
+	// Value* physical = GetValueByPointer(json, "/physical");
+	// Value* application = GetValueByPointer(json, "/application");
 
 	/*iterate for (NetRootTree *next) here*/
 
 }
 
-NetRootTree::~NetRootTree();
-
-NetRootTree::string getName()
+string NetRootTree::getName()
 {
-	return this.GroupName;
-}
-NetRootTree::NetRootTree *getNext()
-{
-	return this.next;
+	return GroupName;
 }
 
-static const *NetRootTree NetRootTree::getByGroupName(const *NetRootTree root, const char *name)
+NetRootTree const *NetRootTree::getNext()
+{
+	return next;
+}
+
+static const NetRootTree *NetRootTree::getByGroupName(const NetRootTree *root, char const *name)
 {
 	const NetRootTree *iter = root;
 	while(root != NULL)
 	{
-		if (root.getByGroupName().compare(name))
+		if (root->getName().compare(name))
 			return iter;
 		else
 			iter = root->getNext();

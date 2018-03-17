@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
 	 * // 4.Application Install
 	 * // 5.Connect trace sources and sinks
 	*/
+	ns3_net::NetRootTree rt("./json/main.json");
+
 	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);
 	if (!quiet)

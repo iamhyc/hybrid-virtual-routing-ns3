@@ -1,0 +1,10 @@
+# project  configured on Sat Mar 17 11:22:02 2018 by
+# waf 1.8.19 (abi 98, python 2070ef0 on linux2)
+# using /home/lab1112/workspace/ns-allinone-3.27/ns-3.27/waf configure
+#
+----------------------------------------
+Setting top to
+/home/lab1112/workspace/hybrid-virtual-routing-ns3
+----------------------------------------
+Setting out to
+/home/lab1112/workspace/hybrid-virtual-routing-ns3/build

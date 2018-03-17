@@ -6,7 +6,7 @@
 #include "ns3/network-module.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/document.h"
-// #include "rapidjson/pointer.h"
+#include "rapidjson/pointer.h"
 
 #include <fstream>
 #include <vector>
@@ -17,7 +17,7 @@ using namespace std;
 const char* kTypeNames[] = 
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 bool documentLint(rapidjson::Document const *json);
-void printDocument(char const *name="", rapidjson::Value const *doc=0, int layer=0);
+void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
 void findMemberName(rapidjson::Value const *, const string name, vector<string> *); //with wildcard
 void getNameBySplitter(const char* message, const char* splitter, vector<string> &tokens)
@@ -51,11 +51,12 @@ namespace ns3_net
 	class NetRootTree
 	{
 	public:
-		NetRootTree(rapidjson::Document);
+		NetRootTree(char const *path);
+		NetRootTree(rapidjson::Document const &);
 		~NetRootTree();
-		static const NetRootTree* getByGroupName(const NetRootTree*, const char *);
+		static const NetRootTree *getByGroupName(const NetRootTree*, char const *);
 		string getName();
-		NetRootTree *getNext();
+		NetRootTree const *getNext();
 
 	private:
 		string GroupName;
