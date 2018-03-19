@@ -1,0 +1,35 @@
+{
+	"__topology_layer__": ["inter_meshnet", "intra_net_subnet", "outer_net_callbackNet"],
+	"topology": {
+		"node-root": false,
+		"intra-router": {},
+
+		"inter-router": {
+			"link-csma": {
+				"ipbase":"10.1.0.0",
+				"ipmask":"255.255.255.0"
+			}
+		},
+		"node-router": {
+			"intra-relay": {
+				"link-p2p":	  { "ipbase":"" ,"ipmask":"" },
+				"link-wifi":  { "ssid":"", "ipbase":"" ,"ipmask":"" }
+			},
+			"node-relay": {
+				"intra-client": {
+					"link-wifi": { "ssid":"", "ipbase":"" ,"ipmask":"" }
+				},
+				"node-client": {}
+			},
+
+			"intra-hybrid": {
+				"link-wifi":  { "ssid":"", "ipbase":"" ,"ipmask":"" }
+			},
+			"node-hybrid": {}
+		}
+	},
+
+	"application": {
+
+	}
+}

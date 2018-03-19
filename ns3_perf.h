@@ -20,9 +20,9 @@ namespace ns3_perf
 {
 	using namespace ns3;
 	
-	const double TOLERANCE = 1e-14;
-	MinMaxAvgTotalCalculator<int> Icalculator;
-	MinMaxAvgTotalCalculator<double> Fcalculator;
+	extern const double TOLERANCE;
+	extern MinMaxAvgTotalCalculator<int> Icalculator;
+	extern MinMaxAvgTotalCalculator<double> Fcalculator;
 }
 
 #endif

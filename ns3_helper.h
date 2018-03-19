@@ -13,17 +13,19 @@
 namespace ns3_helper
 {
 	using namespace ns3;
-	
+	typedef std::map<std::string, WifiHelper> WiFiManager;
+
 	// channel helper
-	static PointToPointHelper p2p;
-	static CsmaHelper csma;
+	extern PointToPointHelper p2p;
+	extern CsmaHelper csma;
 	/*wifi channel: {Area, Numbers, Range, Mobility, Loss, Delay}*/
-	static WifiHelper wifi;
-	static WifiMacHelper wifi_mac;
-	static MobilityHelper mobility;
+	extern WiFiManager wifi_manager;
+	extern WifiHelper wifi;
+	extern WifiMacHelper wifi_mac;
+	extern MobilityHelper mobility;
 	// service helper
-	static InternetStackHelper stack;
-	static Ipv4AddressHelper address;
+	extern InternetStackHelper stack;
+	extern Ipv4AddressHelper address;
 }
 
 #endif

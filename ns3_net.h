@@ -48,9 +48,9 @@ namespace ns3_net
 	public:
 		NetRootTree(char const *path);
 		~NetRootTree();
-		// static const NetRootTree *getByGroupName(const NetRootTree*, char const *);
-		string getName();
-		NetRootTree const *getNext();
+		const NetRootTree *getByGroupName(NetRootTree const *, char const *);
+		string getName() const;
+		NetRootTree const *getNext() const;
 
 	private:
 		string GroupName;

@@ -1,21 +1,19 @@
 {
-	"__topology_layer__": ["inter_subnet1_subnet2", "intra_net_subnet", "outer_net_callbackNet"],
+	"__topology_layer__": ["inter_meshnet", "intra_subnet", "outer_net_callbackNet"],
 	"topology": {
 		"node-root": false,
-		"inter_root_router": {},
-		"inter_self_router": {
-			"ipbase_csma": "10.1.0.0"
+
+		"inter-router": {
+			"link-csma": { "ipbase":"", "ipmask":"" }
 		},
 		"node-router": {
-			"intra_relay": {
-				"wifi_ssid": "router_%1",
-				"ipBase_wifi": "10.2.%1.0",
-				"ipBase_p2p": "10.3.%1.%2"
+			"intra-relay": {
+				"link-p2p":	  { "ipbase":"", "ipmask":"" },
+				"link-wifi":  { "ssid":"", "ipbase":"", "ipmask":"" }
 			},
 			"node-relay": {
-				"intra_client": {
-					"wifi_ssid": "relay_%1_%2",
-					"ipBase_wifi": "127.%1.%2.0"
+				"intra-client": {
+					"link-wifi": { "ssid":"", "ipbase":"", "ipmask":"" }
 				},
 				"node-client": {}
 			}

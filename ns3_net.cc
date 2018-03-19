@@ -97,19 +97,19 @@ NetRootTree::NetRootTree(char const *path)
 	// cout << topology->HasMember("device-router") << endl;
 }
 
-string NetRootTree::getName()
+string NetRootTree::getName() const
 {
 	return GroupName;
 }
 
-NetRootTree const *NetRootTree::getNext()
+NetRootTree const *NetRootTree::getNext() const
 {
 	return next;
 }
 
-/*static const NetRootTree *NetRootTree::getByGroupName(const NetRootTree *root, char const *name)
+const NetRootTree *NetRootTree::getByGroupName(NetRootTree const *root, char const *name)
 {
-	const NetRootTree *iter = root;
+	NetRootTree const *iter = root;
 	while(root != NULL)
 	{
 		if (root->getName().compare(name))
@@ -117,5 +117,5 @@ NetRootTree const *NetRootTree::getNext()
 		else
 			iter = root->getNext();
 	}
+	return NULL;
 }
-*/

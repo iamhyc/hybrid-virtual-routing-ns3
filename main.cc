@@ -10,6 +10,7 @@
  * 4. vlc-p2m-relay-wifi
  * 5. wifi-p2p-relay-wifi
  */
+#include <unistd.h>
 #include <iostream>
 
 #include "ns3_net.h"
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
 	 * // 5.Connect trace sources and sinks
 	*/
 	ns3_net::NetRootTree rt("/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json");
+	// "examples/main/json/main.json"
 
 	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);
