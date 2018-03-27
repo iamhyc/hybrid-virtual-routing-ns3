@@ -1,7 +1,9 @@
 
 #include "ns3_net.h"
 
+using namespace std;
 using namespace rapidjson;
+
 const char* kTypeNames[] = 
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 
@@ -91,25 +93,47 @@ NetRootTree::NetRootTree(char const *path, char const *name):
 	assert(physical->IsObject());
 }
 
+int NetRootTree::getLayer() const
+{
+	return this->layer;
+}
+
 string NetRootTree::getName() const
 {
-	return GroupName;
+	return this->GroupName;
 }
 
-NetRootTree const *NetRootTree::getNext() const
+NetRootTree const *NetRootTree::getNextByIndex(const int num) const
 {
-	return next;
+	return this->pNext[num];
 }
 
-const NetRootTree *NetRootTree::getByGroupName(NetRootTree const *root, char const *name)
+NetRootTree const *NetRootTree::getNextByName(char const *name) const
 {
-	NetRootTree const *iter = root;
-	while(root != NULL)
+	if(strcmp(name, this->GroupName.c_str())==0)
 	{
-		if (root->getName().compare(name))
-			return iter;
-		else
-			iter = root->getNext();
+		return this;
+	}
+
+	for(auto it=this->pNext.begin(); it!=this->pNext.end(); it++)
+	{
+		if((*it)->getName().compare(name))
+		{
+			return *it;
+		}
+	}
+	return NULL;
+}
+
+const NetRootTree *NetRootTree::getByGroupName(char const *name) const
+{
+	for(auto it=this->pNext.begin(); it!=this->pNext.end(); it++)
+	{
+		auto ptr = (*it)->getByGroupName(name);
+		if(ptr!=NULL)
+		{
+			return ptr;
+		}
 	}
 	return NULL;
 }

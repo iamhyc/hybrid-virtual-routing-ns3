@@ -57,13 +57,13 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
    function wafbuild() {
    	local pwd_tmp=$PWD
    	cd $WAF_PATH &&	./waf
-	cd $pwd_tmp
+   	cd $pwd_tmp
    }
 
    function wafrun() {
    	local pwd_tmp=$PWD
    	cd $WAF_PATH &&	waf --run $*
-	cd $pwd_tmp
+   	cd $pwd_tmp
    }
 
    function wafpcap_mv() {

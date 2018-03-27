@@ -13,14 +13,12 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
-
 extern const char* kTypeNames[];
 bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
-void findMemberName(rapidjson::Value const *, const string name, vector<string> *); //with wildcard
-void getNameBySplitter(char const *, char const *, vector<string> &);
+void findMemberName(rapidjson::Value const *, const std::string name, std::vector<std::string> *); //with wildcard
+void getNameBySplitter(char const *, char const *, std::vector<std::string> &);
 
 namespace ns3_net
 {
@@ -30,29 +28,39 @@ namespace ns3_net
 	const int p2pAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 	extern const char* kChannelNames[];
 
-	typedef struct NodeTuple
+	typedef struct NodesTuple
 	{
-		Nodes	nodes;
-		Nets	nets;
-		Ifaces	ifaces;
-	}NodeTuple_t;
+		uint32_t	id;
+		Nodes		nodes;
+		Nets		nets;
+		Ifaces		ifaces;
+	}NodesTuple_t;
+
+	typedef std::vector<NodesTuple> NodesTupleContainer;
+	typedef std::map<uint32_t, std::vector<uint32_t>> InterGroupMap; //NodeTypeId-->{NodesTupleId}
 
 	class NetRootTree
 	{
 	public:
+		typedef std::vector<NetRootTree *> pNetChildren;
+		
 		NetRootTree(char const *path, char const *name="root");
 		~NetRootTree();
 		void printLayers();
-		string getName() const;
-		NetRootTree const *getNext() const;
-		NetRootTree const *getByGroupName(NetRootTree const *, char const *);
+		int getLayer() const;
+		std::string getName() const;
+		NetRootTree const *getNextByIndex(const int) const;
+		NetRootTree const *getNextByName(char const *) const;
+		NetRootTree const *getByGroupName(char const *) const;
 		virtual void applyApplications();
 
 	private:
+		int layer;
+		std::string GroupName;
 		rapidjson::Document json;
-		string GroupName;
-		NodeContainer group;
-		NetRootTree *next;
+		NodesTupleContainer group;
+		InterGroupMap map;
+		pNetChildren pNext;
 	};
 
 }
