@@ -18,18 +18,6 @@ namespace ns3_helper
 	typedef NetDeviceContainer		Nets;
 	typedef Ipv4InterfaceContainer	Ifaces;
 
-	// channel helper
-	extern PointToPointHelper p2p;
-	extern CsmaHelper csma;
-	/*wifi channel: {Area, Numbers, Range, Mobility, Loss, Delay}*/
-	extern WiFiManager wifi_manager;
-	extern WifiHelper wifi;
-	extern WifiMacHelper wifi_mac;
-	extern MobilityHelper mobility;
-	// service helper
-	extern InternetStackHelper stack;
-	extern Ipv4AddressHelper address;
-
 	typedef struct generalSchema
 	{
 		float throughput;
