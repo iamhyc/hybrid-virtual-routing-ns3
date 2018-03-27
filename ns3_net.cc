@@ -16,6 +16,7 @@ bool documentLint(rapidjson::Document const &json)
 	assert(json["topology"].IsObject());
 	assert(json["physical"].IsObject());
 	assert(json["application"].IsObject());
+	// cout << topology->HasMember("device-router") << endl;
 	return true;
 }
 
@@ -71,30 +72,23 @@ NetRootTree::~NetRootTree()
 
 }
 
-NetRootTree::NetRootTree(char const *path)
+NetRootTree::NetRootTree(char const *path, char const *name):
+	GroupName(name)
 {
+	std::cout << this->GroupName << std::endl;
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
-	rapidjson::Document json;
 
-	auto flag = json.ParseStream(isw).HasParseError();
+	auto flag = this->json.ParseStream(isw).HasParseError();
 	assert(flag == 0);
-	documentLint(json); //use assert
+	documentLint(this->json); //use assert
 
-	Value* topology = GetValueByPointer(json, "/topology");
-	Value* physical = GetValueByPointer(json, "/physical");
-	Value* application = GetValueByPointer(json, "/application");
+	Value* topology = GetValueByPointer(this->json, "/topology");
+	Value* physical = GetValueByPointer(this->json, "/physical");
 
 	/*iterate for (NetRootTree *next) here*/
 	assert(topology->IsObject());
 	assert(physical->IsObject());
-	assert(application->IsObject());
-
-	printDocument("topology", topology);
-	printDocument("physical", physical);
-	printDocument("application", application);
-
-	// cout << topology->HasMember("device-router") << endl;
 }
 
 string NetRootTree::getName() const
@@ -118,4 +112,9 @@ const NetRootTree *NetRootTree::getByGroupName(NetRootTree const *root, char con
 			iter = root->getNext();
 	}
 	return NULL;
+}
+
+void NetRootTree::printLayers()
+{
+	printDocument("topology", &(this->json["topology"]));
 }

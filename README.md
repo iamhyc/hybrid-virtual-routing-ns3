@@ -56,12 +56,14 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 
    function wafbuild() {
    	local pwd_tmp=$PWD
-   	cd $WAF_PATH &&	./waf && cd $pwd_tmp
+   	cd $WAF_PATH &&	./waf
+	cd $pwd_tmp
    }
 
    function wafrun() {
    	local pwd_tmp=$PWD
-   	cd $WAF_PATH &&	waf --run $* && cd $pwd_tmp
+   	cd $WAF_PATH &&	waf --run $*
+	cd $pwd_tmp
    }
 
    function wafpcap_mv() {
@@ -71,7 +73,7 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 
    `source` the configuration file
 
-4. `wafbuild && wafrun main` to run the simulation
+4. `wafrun main` to run the main simulation
 
 ### Todo
 - [ ] Network JSON Parse

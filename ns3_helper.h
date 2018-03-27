@@ -14,6 +14,9 @@ namespace ns3_helper
 {
 	using namespace ns3;
 	typedef std::map<std::string, WifiHelper> WiFiManager;
+	typedef NodeContainer			Nodes;
+	typedef NetDeviceContainer		Nets;
+	typedef Ipv4InterfaceContainer	Ifaces;
 
 	// channel helper
 	extern PointToPointHelper p2p;
@@ -26,6 +29,25 @@ namespace ns3_helper
 	// service helper
 	extern InternetStackHelper stack;
 	extern Ipv4AddressHelper address;
+
+	typedef struct generalSchema
+	{
+		float throughput;
+		float delay;
+	}generalSchema_t;
+
+	typedef struct wifiSchema
+	{
+		char* ssid;
+		char* standard;//IEEE 802.11
+		int mobility[4];
+		int channel;
+		int bandwidth;
+	}wifiSchema_t;
+
+	void p2pDefaultHelper(Nodes const &, Nets &, Ifaces &);
+	void csmaDefaultHelper(Nodes const &, Nets &, Ifaces &);
+	void wifiDefaultHelper(Nodes const &, Nets &, Ifaces &);
 }
 
 #endif

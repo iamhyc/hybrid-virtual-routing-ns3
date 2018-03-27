@@ -21,6 +21,15 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("HybridVirtualRouting");
 
+namespace ns3_net
+{
+	void NetRootTree::applyApplications()
+	{
+		rapidjson::Value* application = GetValueByPointer(this->json, "/application");
+		assert(application->IsObject());
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	/* Command Parameter Parse */
@@ -43,8 +52,10 @@ int main(int argc, char *argv[])
 	 * // 4.Application Install
 	 * // 5.Connect trace sources and sinks
 	*/
-	ns3_net::NetRootTree rt("/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json");
-	// "examples/main/json/main.json"
+	auto json_file = //"examples/main/json/main.json";
+		"/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json";
+	ns3_net::NetRootTree rt(json_file);
+	rt.printLayers();
 
 	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);
