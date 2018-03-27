@@ -13,7 +13,7 @@ void getNameBySplitter(char const *message, char const *splitter, vector<string>
 	boost::split(tokens, message, boost::is_any_of(splitter));
 }
 
-bool documentLint(rapidjson::Document const &json)
+bool documentLint(Document const &json)
 {
 	assert(json["topology"].IsObject());
 	assert(json["physical"].IsObject());
@@ -54,7 +54,7 @@ void printDocument(char const *name="", Value const *doc=0, int layer=0)
 	return;
 }
 
-void findMemberName(rapidjson::Value const *doc, const std::string name, std::vector<std::string> &output)
+void findMemberName(Value const *doc, const std::string name, std::vector<std::string> &output)
 {
 	for(auto& m : doc->GetObject())
 	{
@@ -74,23 +74,29 @@ NetRootTree::~NetRootTree()
 
 }
 
-NetRootTree::NetRootTree(char const *path, char const *name):
-	GroupName(name)
+NetRootTree::NetRootTree(char const *path, Document &doc):
+	GroupName("root")
 {
-	std::cout << this->GroupName << std::endl;
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
 
-	auto flag = this->json.ParseStream(isw).HasParseError();
+	auto flag = doc.ParseStream(isw).HasParseError();
 	assert(flag == 0);
-	documentLint(this->json); //use assert
+	documentLint(doc); //use assert
 
-	Value* topology = GetValueByPointer(this->json, "/topology");
-	Value* physical = GetValueByPointer(this->json, "/physical");
+	this->topology = doc["topology"];
+	this->physical = doc["physical"];
 
 	/*iterate for (NetRootTree *next) here*/
-	assert(topology->IsObject());
-	assert(physical->IsObject());
+	assert(this->topology.IsObject());
+	assert(this->physical.IsObject());
+}
+
+NetRootTree::NetRootTree(Value &topo, Value &phy, char const *name):
+	GroupName(name)
+{
+	this->topology = topo;
+	this->physical = phy;
 }
 
 int NetRootTree::getLayer() const
@@ -140,5 +146,5 @@ const NetRootTree *NetRootTree::getByGroupName(char const *name) const
 
 void NetRootTree::printLayers()
 {
-	printDocument("topology", &(this->json["topology"]));
+	printDocument("topology", &(this->topology));
 }

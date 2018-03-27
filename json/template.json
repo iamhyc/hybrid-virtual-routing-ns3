@@ -1,0 +1,22 @@
+{
+    "template_csma": {
+        "throughput": "1000Mbps",
+        "delay": "2ms"
+    },
+    "template_p2p": {
+        "throughput": "1000Mbps",
+        "delay": "2ms"
+    },
+    "template_wifi_A": {
+        "mobility": [0,5,0,0],
+        "channel": 1,
+        "bandwidth": 20,
+        "standard": "802.11ac"
+    },
+    "template_wifi_B": {
+        "mobility": [0,5,0,0],
+        "channel": 1,
+        "bandwidth": 20,
+        "standard": "802.11ac"
+    }
+}

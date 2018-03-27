@@ -1,81 +1,65 @@
 {
-	"__topology_layer__": ["inter_meshnet", "intra_subnet", "outer_net_callbackNet"],
+	"__topology_layer__": [
+		"inter_meshnet",
+		"intra_subnet",
+		"outer_net_callbackNet"
+	],
+
 	"topology": {
 		"node-root": false,
-
 		"inter-router": {
-			"link-csma": { "ipbase":"", "ipmask":"" }
+			"link-csma": {"ipbase": "","ipmask": ""}
 		},
 		"node-router": {
 			"intra-relay": {
-				"link-p2p":	  { "ipbase":"", "ipmask":"" },
-				"link-wifi":  { "ssid":"", "ipbase":"", "ipmask":"" }
+				"link-p2p": {"ipbase": "","ipmask": ""},
+				"link-wifi": {"ssid": "","ipbase": "","ipmask": ""}
 			},
 			"node-relay": {
 				"intra-client": {
-					"link-wifi": { "ssid":"", "ipbase":"", "ipmask":"" }
+					"link-wifi": {"ssid": "","ipbase": "","ipmask": ""}
 				},
 				"node-client": {}
 			}
 		}
 	},
-
+	
 	"physical": {
-		"csma_config": {
-			"throughput": "1000Mbps",
-			"delay": "2ms"
-		},
-
-		"router_number": 2,
-		"router_config": [{
-				"wifi_config": {
-					"mobility": [0, 5, 0, 0],
-					"channel": 1,
-					"bandwidth": 20,
-					"standard": "802.11ac"
-				},
-				"p2p_config": {
-					"throughput": "20Mbps",
-					"p2p_delay": "2ms"
-				},
-
-				"relay_number": 1,
-				"relay_config": [{
-					"wifi_config": {
-						"mobility": [0, 5, 0, 0],
-						"channel": 1,
-						"bandwidth": 20,
-						"standard": "802.11ac"
+		"link-csma": "template_csma",
+		"node-router": {
+			"node-number": 3,
+			"node-config": [
+				{
+					"relative-index": -1,
+					"link-p2p": "template_p2p",
+					"link-wifi": "template_wifi_A",
+					"node-relay": {
+						"node-number": 1,
+						"node-config": [
+							{
+								"relative-index": -1,
+								"link-wifi": "template_wifi_B",
+								"node-client": {
+									"node-number": 5,
+									"node-config": []
+								}
+							}
+						]
 					}
-				}]
-			},
-
-			{
-				"wifi_config": {
-					"mobility": [0, -5, 0, 0],
-					"channel": 6,
-					"bandwidth": 20,
-					"standard": "802.11ac"
 				},
-				"p2p_config": {
-					"throughput": "20Mbps",
-					"p2p_delay": "2ms"
+				{
+					"relative-index": 0,
+					"node-relay/node-number": ["update",1],
+					"node-relay/node-config": ["append",{
+							"relative-index": 0,
+							"node-client/node-number": 4
+						}]
 				},
-
-				"relay_number": 1,
-				"relay_config": [{
-					"wifi_config": {
-						"mobility": [0, -5, 0, 0],
-						"channel": 6,
-						"bandwidth": 20,
-						"standard": "802.11ac"
-					}
-				}]
-			}
-		]
+				{
+					"relative-index": 1
+				}
+			]
+		}
 	},
-
-	"application": {
-
-	}
+	"application": {}
 }

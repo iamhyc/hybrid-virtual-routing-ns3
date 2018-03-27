@@ -44,7 +44,8 @@ namespace ns3_net
 	public:
 		typedef std::vector<NetRootTree *> pNetChildren;
 		
-		NetRootTree(char const *path, char const *name="root");
+		NetRootTree(char const *path, rapidjson::Document &doc);
+		NetRootTree(rapidjson::Value &, rapidjson::Value &, char const *name);
 		~NetRootTree();
 		void printLayers();
 		int getLayer() const;
@@ -57,7 +58,7 @@ namespace ns3_net
 	private:
 		int layer;
 		std::string GroupName;
-		rapidjson::Document json;
+		rapidjson::Value topology, physical;
 		NodesTupleContainer group;
 		InterGroupMap map;
 		pNetChildren pNext;
