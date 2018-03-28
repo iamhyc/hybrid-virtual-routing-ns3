@@ -19,14 +19,13 @@ bool documentLint(bool flag, Document const &json)
 	assert(json["topology"].IsObject());
 	assert(json["physical"].IsObject());
 	assert(json["application"].IsObject());
-	// cout << json["topology"].HasMember("device-router") << endl;
 	return true;
 }
 
 void printDocument(char const *name="", Value const *doc=0, int layer=0)
 {
 	string m_indent(layer, '\t');
-	if (string(name).compare(""))
+	if (string(name).compare("")!=0)
 	{
 		printf("%s%s: \n", m_indent.c_str(), name);
 	}
@@ -71,9 +70,14 @@ using namespace ns3_net;
 
 NetRootTree::~NetRootTree()
 {
-	if(this->GroupName.compare("root"))
+	if(this->GroupName.compare("root")==0)
 	{
-		delete this->doc;
+		printf("__root_exit__\n");
+		/* delete this->doc; //FIXME: need to figure out why double free here. */
+	}
+	else
+	{
+		printf("__%s_destruct__\n", this->GroupName.c_str());
 	}
 }
 
@@ -88,7 +92,9 @@ NetRootTree::NetRootTree(char const *path):
 	documentLint(flag, document);
 	//init
 	this->doc = move(&document);
-	NetRootTree(this->doc, (*this->doc)["topology"], (*this->doc)["physical"], "root");
+	this->topology = (*this->doc)["topology"];
+	this->physical = (*this->doc)["physical"];
+	construct();
 }
 
 NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *name) : GroupName(name)
@@ -129,7 +135,7 @@ NetRootTree const *NetRootTree::getNextByName(char const *name) const
 
 	for(auto it=this->pNext.begin(); it!=this->pNext.end(); it++)
 	{
-		if((*it)->getName().compare(name))
+		if((*it)->getName().compare(name)==0)
 		{
 			return *it;
 		}
