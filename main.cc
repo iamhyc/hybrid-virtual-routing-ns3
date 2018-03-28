@@ -25,7 +25,7 @@ namespace ns3_net
 {
 	void NetRootTree::applyApplications()
 	{
-		rapidjson::Value* application = GetValueByPointer(this->json, "/application");
+		rapidjson::Value* application = GetValueByPointer(*(this->doc), "/application");
 		assert(application->IsObject());
 	}
 }

@@ -71,30 +71,35 @@ const char* kChannelNames[] = { "csma", "wifi", "p2p" };
 
 NetRootTree::~NetRootTree()
 {
-
+	if(this->GroupName.compare("root"))
+	{
+		delete this->doc;
+	}
 }
 
-NetRootTree::NetRootTree(char const *path, Document &doc):
+NetRootTree::NetRootTree(char const *path):
 	GroupName("root")
 {
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
 
-	auto flag = doc.ParseStream(isw).HasParseError();
+	Document document;
+	this->doc = move(&document);
+	auto flag = (*this->doc).ParseStream(isw).HasParseError();
 	assert(flag == 0);
-	documentLint(doc); //use assert
+	documentLint(*this->doc); //use assert
 
-	this->topology = doc["topology"];
-	this->physical = doc["physical"];
+	this->topology = (*this->doc)["topology"];
+	this->physical = (*this->doc)["physical"];
 
 	/*iterate for (NetRootTree *next) here*/
-	assert(this->topology.IsObject());
-	assert(this->physical.IsObject());
+	
 }
 
-NetRootTree::NetRootTree(Value &topo, Value &phy, char const *name):
+NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *name):
 	GroupName(name)
 {
+	this->doc = doc;
 	this->topology = topo;
 	this->physical = phy;
 }
