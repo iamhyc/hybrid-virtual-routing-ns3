@@ -25,8 +25,7 @@ namespace ns3_net
 	using namespace ns3;
 	using namespace ns3_helper;
 
-	const int p2pAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
-	extern const char* kChannelNames[];
+	const int ipAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 
 	typedef struct NodesTuple
 	{
@@ -47,6 +46,7 @@ namespace ns3_net
 		NetRootTree(char const *path);
 		NetRootTree(rapidjson::Document *,rapidjson::Value &, rapidjson::Value &, char const *name);
 		~NetRootTree();
+		void construct();
 		void printLayers();
 		int getLayer() const;
 		std::string getName() const;

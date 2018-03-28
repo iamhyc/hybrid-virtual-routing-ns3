@@ -1,6 +1,8 @@
 #ifndef __NS3_HELPER_H__
 #define __NS3_HELPER_H__
 
+#define UNUSED(x) (void)(x)
+
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
@@ -35,7 +37,7 @@ namespace ns3_helper
 
 	void p2pDefaultHelper(Nodes const &, Nets &, Ifaces &);
 	void csmaDefaultHelper(Nodes const &, Nets &, Ifaces &);
-	void wifiDefaultHelper(Nodes const &, Nets &, Ifaces &);
+	void wifiDefaultHelper(Ptr<Node> const &, Nodes const &, Nets &, Ifaces &);
 }
 
 #endif

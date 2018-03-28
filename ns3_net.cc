@@ -13,12 +13,13 @@ void getNameBySplitter(char const *message, char const *splitter, vector<string>
 	boost::split(tokens, message, boost::is_any_of(splitter));
 }
 
-bool documentLint(Document const &json)
+bool documentLint(bool flag, Document const &json)
 {
+	assert(flag == 0);
 	assert(json["topology"].IsObject());
 	assert(json["physical"].IsObject());
 	assert(json["application"].IsObject());
-	// cout << topology->HasMember("device-router") << endl;
+	// cout << json["topology"].HasMember("device-router") << endl;
 	return true;
 }
 
@@ -67,7 +68,6 @@ void findMemberName(Value const *doc, const std::string name, std::vector<std::s
 }
 
 using namespace ns3_net;
-const char* kChannelNames[] = { "csma", "wifi", "p2p" };
 
 NetRootTree::~NetRootTree()
 {
@@ -82,26 +82,27 @@ NetRootTree::NetRootTree(char const *path):
 {
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
-
+	// Load JSON from file
 	Document document;
+	auto flag = (document).ParseStream(isw).HasParseError();
+	documentLint(flag, document);
+	//init
 	this->doc = move(&document);
-	auto flag = (*this->doc).ParseStream(isw).HasParseError();
-	assert(flag == 0);
-	documentLint(*this->doc); //use assert
-
-	this->topology = (*this->doc)["topology"];
-	this->physical = (*this->doc)["physical"];
-
-	/*iterate for (NetRootTree *next) here*/
-	
+	NetRootTree(this->doc, (*this->doc)["topology"], (*this->doc)["physical"], "root");
 }
 
-NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *name):
-	GroupName(name)
+NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *name) : GroupName(name)
 {
 	this->doc = doc;
 	this->topology = topo;
 	this->physical = phy;
+	construct();
+}
+
+void NetRootTree::construct()
+{
+	printf("Building <%s>:\n", this->GroupName.c_str());
+	/*iterate for (NetRootTree *next) here*/
 }
 
 int NetRootTree::getLayer() const

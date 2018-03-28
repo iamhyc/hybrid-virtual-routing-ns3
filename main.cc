@@ -26,7 +26,7 @@ namespace ns3_net
 	void NetRootTree::applyApplications()
 	{
 		rapidjson::Value* application = GetValueByPointer(*(this->doc), "/application");
-		assert(application->IsObject());
+		UNUSED(application);
 	}
 }
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	auto json_file = //"examples/main/json/main.json";
 		"/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json";
 	ns3_net::NetRootTree rt(json_file);
-	rt.printLayers();
+	// rt.printLayers();
 
 	//6.Simulator Setup 
 	Time::SetResolution(Time::NS);

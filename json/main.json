@@ -1,9 +1,5 @@
 {
-	"__topology_layer__": [
-		"inter_meshnet",
-		"intra_subnet",
-		"outer_net_callbackNet"
-	],
+	"__topology_layer__": ["inter_meshnet","intra_subnet","outer_net_callbackNet"],
 
 	"topology": {
 		"node-root": false,

@@ -66,6 +66,12 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
    	cd $pwd_tmp
    }
 
+   function wafgdb() {
+   	local pwd_tmp=$PWD
+   	cd $WAF_PATH &&	waf --run $1 --command-template="gdb ${${*}#${1}}"
+   	cd $pwd_tmp
+   }
+
    function wafpcap_mv() {
    	rm -rf ./$1-\*.pcap && mv -f $WAF_PATH/$1-*.pcap ./$1-pcap/
    }
