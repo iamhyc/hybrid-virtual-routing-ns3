@@ -123,19 +123,20 @@ void NetRootTree::construct()
 	/* Iterate (NetRootTree *next) Here */
 	findMemberName(&this->topology, "node", tmp);
 	for(auto it = tmp.begin(); it<tmp.end(); ++it)
-	{
+	{//iterate node group
 		char const *name = move(it->c_str());
 		NodesTuple tuple = {.id=0}; //FIXME:*id* currently not used
 
 		//"node-number" is Number; "node-config" is Array
+		assert(this->topology[name].IsObject());
 		assert(this->physical[name].IsObject());
 		auto nNodes = this->physical[name]["node-number"].GetInt();
 		auto config = this->physical[name]["node-config"].GetArray();
 		/* Create Nodes Hierarchical */
 		tuple.nodes.Create(nNodes);
 		this->pNext = move(pNetChildren(nNodes));
-		for(auto& v : config)
-		{
+		for(Value& v : config)
+		{//iterate node
 			//"node-index", "relative"/["index", "update", "append"]
 			int __start, __end;
 
@@ -161,7 +162,11 @@ void NetRootTree::construct()
 
 			//remove useless item to assemble *config*
 			v.RemoveMember("node-index");
-
+			for(int k=__start; k<=__end; ++k)
+			{//iterate certain apply
+				this->pNext[k] = \
+					&NetRootTree(this->doc, this->topology[name], v, this->layer + 1, name);
+			}
 		}
 		/* Create Network Devices */
 		findMemberName(&this->topology, "intra", tmp);
