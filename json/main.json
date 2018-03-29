@@ -28,7 +28,8 @@
 								"node-index":0,
 								"link-wifi": "template_wifi_B",
 								"node-client": {
-									"node-number": 5
+									"node-number": 5,
+									"node-config": []
 								}
 							}
 						]
@@ -43,7 +44,7 @@
 						},
 						"append":{
 							"node-relay/node-config":{
-								"relative-index": 0,
+								"relative": {"index":0},
 								"node-client/node-number": 4
 							}
 						}
@@ -52,5 +53,31 @@
 			]
 		}
 	},
-	"application": {}
+
+	"application": {},
+
+	"template":{
+		"template_csma": {
+			"throughput": "1000Mbps",
+			"delay": "2ms"
+		},
+		"template_p2p": {
+			"throughput": "1000Mbps",
+			"delay": "2ms"
+		},
+		"template_wifi_A": {
+			"ssid": "wifi-A-%4%",
+			"mobility": [0,5,0,0],
+			"channel": 1,
+			"bandwidth": 20,
+			"standard": "802.11ac"
+		},
+		"template_wifi_B": {
+			"ssid": "wifi-B-%4%",
+			"mobility": [0,5,0,0],
+			"channel": 1,
+			"bandwidth": 20,
+			"standard": "802.11ac"
+		}
+	}
 }

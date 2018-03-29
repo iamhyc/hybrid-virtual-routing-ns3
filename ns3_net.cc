@@ -7,7 +7,7 @@ using namespace rapidjson;
 const char* kTypeNames[] = 
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 
-void getNameBySplitter(char const *message, char const *splitter, vector<string> &tokens)
+void getNameBySplitter(char const *message, char const *splitter, StringVector &tokens)
 {
 	/*e.g. getNamebySplitter("ipBase", "_", tokens); ("device", "-", tokens)*/
 	boost::split(tokens, message, boost::is_any_of(splitter));
@@ -22,10 +22,23 @@ bool documentLint(bool flag, Document const &json)
 	return true;
 }
 
-void printDocument(char const *name="", Value const *doc=0, int layer=0)
+void HierPrint(string const &str, int layer, string const &type="default")
 {
 	string m_indent(layer, '\t');
-	if (string(name).compare("")!=0)
+	if (str.compare("build") == 0)
+	{
+		printf("%sBuilding <%s>: \n", m_indent.c_str(), str.c_str());	
+	}
+	else
+	{
+		printf("%s%s\n", m_indent.c_str(), str.c_str());
+	}
+}
+
+void printDocument(char const *name, Value const *doc, int layer=0)
+{
+	string m_indent(layer, '\t');
+	if (string(name).compare("") != 0)
 	{
 		printf("%s%s: \n", m_indent.c_str(), name);
 	}
@@ -39,7 +52,7 @@ void printDocument(char const *name="", Value const *doc=0, int layer=0)
 				printDocument(m.name.GetString(), &m.value, layer+1);
 				break;
 			case 4: //Array
-				if (m.value[0].IsObject())
+				if (m.value.Capacity()>0 && m.value[0].IsObject())
 				{
 					printf("%s\t\"%s\" [\n", m_indent.c_str(), m.name.GetString());
 					printDocument("", &m.value[0], layer+1);
@@ -54,7 +67,7 @@ void printDocument(char const *name="", Value const *doc=0, int layer=0)
 	return;
 }
 
-void findMemberName(Value const *doc, const std::string name, std::vector<std::string> &output)
+void findMemberName(Value const *doc, const std::string name, StringVector &output)
 {
 	for(auto& m : doc->GetObject())
 	{
@@ -82,7 +95,7 @@ NetRootTree::~NetRootTree()
 }
 
 NetRootTree::NetRootTree(char const *path):
-	GroupName("root")
+	layer(0), GroupName("root")
 {
 	ifstream ifs(path, fstream::in);
 	IStreamWrapper isw(ifs);
@@ -97,7 +110,8 @@ NetRootTree::NetRootTree(char const *path):
 	construct();
 }
 
-NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *name) : GroupName(name)
+NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char const *name):
+	layer(layer), GroupName(name)
 {
 	this->doc = doc;
 	this->topology = topo;
@@ -107,8 +121,79 @@ NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, char const *nam
 
 void NetRootTree::construct()
 {
-	printf("Building <%s>:\n", this->GroupName.c_str());
-	/*iterate for (NetRootTree *next) here*/
+	// int count = 0;
+	StringVector tmp;
+
+	HierPrint(this->GroupName, this->layer, "build");
+	/* Iterate (NetRootTree *next) Here */
+	findMemberName(&this->topology, "node", tmp);
+	for(auto it = tmp.begin(); it<tmp.end(); ++it)
+	{
+		char const *name = move(it->c_str());
+		NodesTuple tuple = {.id=0}; //FIXME:currently not used
+
+		//"node-number" is Number; "node-config" is Array
+		assert(this->physical[name].IsObject());
+		auto nNodes = this->physical[name]["node-number"].GetInt();
+		auto config = this->physical[name]["node-config"].GetArray();
+		/* Create Nodes Hierarchical */
+		tuple.nodes.Create(nNodes);
+		this->pNext = move(pNetChildren(nNodes));
+		for(auto& v : config)
+		{
+			//"node-index", "relative"/["index", "update", "append"]
+			int __start, __end;
+
+			if(v["node-index"].IsInt())
+			{
+				__start = v["node-index"].GetInt();
+				__end = __start;
+			}
+			if(v["node-index"].IsObject)
+			{
+				__start = v["node-index"]["begin"].GetInt();
+				__end = v["node-index"]["end"].GetInt();
+			}
+			
+			if(v.HasMember("relative"))
+			{
+				auto index = v["relative"]["index"].GetInt();
+				expand_template(config[index], v);
+			}
+
+		}
+		/* Create Network Devices */
+		findMemberName(&this->topology, "intra", tmp);
+	}
+	findMemberName(&this->topology, "inter", tmp);
+	findMemberName(&this->topology, "outer", tmp); //TODO:add outer link callback
+}
+
+void NetRootTree::expand_template(Value &ref, Value &tmpl)
+{
+	auto &allocator = this->doc->GetAllocator();
+	Document tmp;
+
+	tmp.CopyFrom(ref, allocator);
+
+	if(tmpl.HasMember("update"))
+	{
+		assert(tmpl["update"].IsObject());
+		for(auto& m : tmpl["update"].GetObject())
+		{
+			const char path[strlen(m.name.GetString())] = m.name.GetString();
+			GetValueByPointer(tmp, path);
+
+		}
+	}
+
+	if(tmpl.HasMember("append"))
+	{
+		Document tmp;
+		assert(tmpl["append"].IsObject());
+	}
+
+	tmpl.CopyFrom(tmp, tmp.GetAllocator());
 }
 
 int NetRootTree::getLayer() const

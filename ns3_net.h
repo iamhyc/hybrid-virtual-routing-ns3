@@ -13,12 +13,15 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
+typedef std::vector<std::string> StringVector;
+
 extern const char* kTypeNames[];
+void HierPrint(string const &str, int layer, string const &type);
 bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
-void findMemberName(rapidjson::Value const *, const std::string name, std::vector<std::string> *); //with wildcard
-void getNameBySplitter(char const *, char const *, std::vector<std::string> &);
+void findMemberName(rapidjson::Value const *, const std::string name, StringVector &); //with wildcard
+void getNameBySplitter(char const *, char const *, StringVector &);
 
 namespace ns3_net
 {
@@ -44,12 +47,14 @@ namespace ns3_net
 		typedef std::vector<NetRootTree *> pNetChildren;
 	//construct
 		NetRootTree(char const *path);
-		NetRootTree(rapidjson::Document *,rapidjson::Value &, rapidjson::Value &, char const *name);
+		NetRootTree(rapidjson::Document *,rapidjson::Value &, rapidjson::Value &, \
+			int layer, char const *name);
 		~NetRootTree();
 		void construct();
 	//helper function
-		void printLayers();
 		int getLayer() const;
+		void printLayers();
+		void expand_template(Value &ref, Value &tmpl);
 		std::string getName() const;
 		NetRootTree const *getNextByIndex(const int) const;
 		NetRootTree const *getNextByName(char const *) const;
