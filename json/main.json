@@ -40,12 +40,16 @@
 					"relative":{
 						"index":0,
 						"update":{
-							"node-relay/node-number":1
+							"/node-relay/node-number":1
 						},
 						"append":{
-							"node-relay/node-config":{
-								"relative": {"index":0},
-								"node-client/node-number": 4
+							"/node-relay/node-config":{
+								"relative": {
+									"index":0,
+									"update":{
+										"/node-client/node-number": 4
+									}
+								}
 							}
 						}
 					}
