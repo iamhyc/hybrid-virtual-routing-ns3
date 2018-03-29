@@ -52,8 +52,7 @@ int main(int argc, char *argv[])
 	 * // 4.Application Install
 	 * // 5.Connect trace sources and sinks
 	*/
-	auto json_file = //"examples/main/json/main.json";
-		"/home/lab1112/workspace/hybrid-virtual-routing-ns3/json/main.json";
+	auto json_file = "examples/main/json/main.json";
 	ns3_net::NetRootTree rt(json_file);
 	// rt.printLayers();
 

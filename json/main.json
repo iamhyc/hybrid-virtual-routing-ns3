@@ -2,19 +2,11 @@
 	"__topology_layer__": ["inter_meshnet","intra_subnet","outer_net_callbackNet"],
 
 	"topology": {
-		"node-root": false,
-		"inter-router": {
-			"link-csma": {"ipbase": "","ipmask": ""}
-		},
+		"inter-router": ["link-csma"],
 		"node-router": {
-			"intra-relay": {
-				"link-p2p": {"ipbase": "","ipmask": ""},
-				"link-wifi": {"ssid": "","ipbase": "","ipmask": ""}
-			},
+			"intra-relay": ["link-p2p", "link-wifi"],
 			"node-relay": {
-				"intra-client": {
-					"link-wifi": {"ssid": "","ipbase": "","ipmask": ""}
-				},
+				"intra-client": ["link-wifi"],
 				"node-client": {}
 			}
 		}
@@ -26,33 +18,36 @@
 			"node-number": 3,
 			"node-config": [
 				{
-					"relative-index": -1,
+					"node-index":0,
 					"link-p2p": "template_p2p",
 					"link-wifi": "template_wifi_A",
 					"node-relay": {
 						"node-number": 1,
 						"node-config": [
 							{
-								"relative-index": -1,
+								"node-index":0,
 								"link-wifi": "template_wifi_B",
 								"node-client": {
-									"node-number": 5,
-									"node-config": []
+									"node-number": 5
 								}
 							}
 						]
 					}
 				},
 				{
-					"relative-index": 0,
-					"node-relay/node-number": ["update",1],
-					"node-relay/node-config": ["append",{
-							"relative-index": 0,
-							"node-client/node-number": 4
-						}]
-				},
-				{
-					"relative-index": 1
+					"node-index":{"begin":1,"end":2},
+					"relative":{
+						"index":0,
+						"update":{
+							"node-relay/node-number":1
+						},
+						"append":{
+							"node-relay/node-config":{
+								"relative-index": 0,
+								"node-client/node-number": 4
+							}
+						}
+					}
 				}
 			]
 		}

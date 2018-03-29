@@ -42,27 +42,32 @@ namespace ns3_net
 	{
 	public:
 		typedef std::vector<NetRootTree *> pNetChildren;
-		
+	//construct
 		NetRootTree(char const *path);
 		NetRootTree(rapidjson::Document *,rapidjson::Value &, rapidjson::Value &, char const *name);
 		~NetRootTree();
 		void construct();
+	//helper function
 		void printLayers();
 		int getLayer() const;
 		std::string getName() const;
 		NetRootTree const *getNextByIndex(const int) const;
 		NetRootTree const *getNextByName(char const *) const;
 		NetRootTree const *getByGroupName(char const *) const;
+	//virtual function
 		virtual void applyApplications();
 
 	private:
+	//id
 		int layer;
 		std::string GroupName;
+		NodesTupleContainer group;
+	//const DOM
 		rapidjson::Document* doc;
 		rapidjson::Value topology, physical;
-		NodesTupleContainer group;
-		InterGroupMap map;
-		pNetChildren pNext;
+	//relationship
+		InterGroupMap map;		//interconnection
+		pNetChildren pNext;		//to sublayer
 	};
 
 }

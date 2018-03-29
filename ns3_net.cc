@@ -159,4 +159,5 @@ const NetRootTree *NetRootTree::getByGroupName(char const *name) const
 void NetRootTree::printLayers()
 {
 	printDocument("topology", &(this->topology));
+	printDocument("physical", &(this->physical));
 }
