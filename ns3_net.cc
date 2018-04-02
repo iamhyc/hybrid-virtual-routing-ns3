@@ -80,7 +80,10 @@ NetRootTree::~NetRootTree()
 	if(this->GroupName.compare("root")==0)
 	{
 		HierPrint("__root_exit__", "inline");
-		/* delete this->doc; //FIXME: need to figure out why double free here. */
+		for(auto it=this->pNext.begin(); it<this->pNext.end();++it)
+		{
+			delete &(*it);
+		}
 	}
 	else
 	{
@@ -125,7 +128,7 @@ void NetRootTree::construct()
 	for(auto it = tmp.begin(); it<tmp.end(); ++it)
 	{//iterate node group
 		char const *name = move(it->c_str());
-		NodesTuple tuple = {.id=0}; //FIXME:*id* currently not used
+		NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
 
 		//"node-number" is Number; "node-config" is Array
 		assert(this->topology[name].IsObject());
@@ -134,11 +137,11 @@ void NetRootTree::construct()
 		auto config = this->physical[name]["node-config"].GetArray();
 		/* Create Nodes Hierarchical */
 		tuple.nodes.Create(nNodes);
-		this->pNext = move(pNetChildren(nNodes));
+		this->pNext = pNetChildren(nNodes);
 		for(Value& v : config)
 		{//iterate node
 			//"node-index", "relative"/["index", "update", "append"]
-			int __start, __end;
+			int __start=0, __end=0;
 
 			if(v["node-index"].IsInt())
 			{
@@ -165,7 +168,7 @@ void NetRootTree::construct()
 			for(int k=__start; k<=__end; ++k)
 			{//iterate certain apply
 				this->pNext[k] = \
-					&NetRootTree(this->doc, this->topology[name], v, this->layer + 1, name);
+					new NetRootTree(this->doc, this->topology[name], v, this->layer + 1, name);
 			}
 		}
 		/* Create Network Devices */
