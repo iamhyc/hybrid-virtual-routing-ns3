@@ -8,11 +8,11 @@ char build_log[255];
 const char* kTypeNames[] = 
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 map<string, int> PrintHelper=
-	{
+{
 		{"default",		-1},
 		{"build",		0},
 		{"inline",		1}
-	};
+};
 
 void getNameBySplitter(char const *message, char const *splitter, StringVector &tokens)
 {
@@ -120,50 +120,64 @@ NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char
 void NetRootTree::construct()
 {
 	// int count = 0;
-	StringVector tmp;
+	StringVector strs;
+	findMemberName(&this->topology, "node", strs);
 
 	HierPrint(this->GroupName.c_str(), "build");
-	/* Iterate (NetRootTree *next) Here */
-	expand_chidren();
-	findMemberName(&this->topology, "inter", tmp);
-	findMemberName(&this->topology, "outer", tmp); //TODO:add outer link callback
-}
 
-void NetRootTree::expand_chidren()
-{
-	StringVector tmp;
-	findMemberName(&this->topology, "node", tmp);
-
-	for(auto it = tmp.begin(); it<tmp.end(); ++it)
-	{//iterate node group
-		char const *child_name = move(it->c_str());
-		NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
-
-		//"node-number" is Number; "node-config" is Array
-		assert(this->topology[child_name].IsObject());
-		assert(this->physical[child_name].IsObject());
-		auto nNodes = this->physical[child_name]["node-number"].GetInt();
-		auto config = this->physical[child_name]["node-config"].GetArray();
-		/* Create Nodes Hierarchical */
-		tuple.nodes.Create(nNodes);
-		this->pNext = pNetChildren(nNodes);
-		if(config.Empty())
-		{
-			HierPrint("End Of File", "default");
-		}
-		else
-		{
-			expand_config(config, child_name);
-		}
-		/* Create Network Devices */
-		findMemberName(&this->topology, "intra", tmp);
+	if(this->GroupName.compare("root")==0)
+	{
+		//bypass root device here; (now, "node-root" is FALSE as default)
+		char const *name = strs[0].c_str();
+		this->pNext = pNetChildren(1);
+		this->pNext[0] = \
+				new NetRootTree(this->doc, this->topology[name], this->physical[name], this->layer + 1, name);
 	}
+	else
+	{
+		expand_children(strs);
+	}
+	findMemberName(&this->topology, "inter", strs); //TODO:ass inter link
+	findMemberName(&this->topology, "outer", strs); //TODO:add outer link callback
 }
 
-void NetRootTree::expand_config(Value::Array &config, char const *child_name)
+/* 1. Iterate (NetRootTree *next) Here */
+void NetRootTree::expand_children(StringVector &Children)
+{
+	//"node-number" is Number; "node-config" is Array
+	assert(this->physical["node-number"].IsInt());
+	assert(this->physical["node-config"].IsArray());
+
+	StringVector strs;
+	NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
+	auto nNodes = this->physical["node-number"].GetInt();
+	auto config = this->physical["node-config"].GetArray();
+
+	/* Create Nodes Hierarchical */
+	tuple.nodes.Create(nNodes);
+	this->pNext = pNetChildren(nNodes);
+
+	if(config.Empty())
+	{
+		HierPrint("End Of File", "default");
+	}
+	else
+	{
+		expand_config(config, Children);
+	}
+	
+	/* Create Network Devices */
+	findMemberName(&this->topology, "intra", strs);
+	//TODO:"intra" links establish
+}
+
+/* 2. Expand Specified Config Here */
+void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 {
 	int __start=0, __end=0;
-
+	//FIXME:pNext SHOULD BE A Vector<Vector<NetRootTree *>>; rewrite iteration
+	//for(auto it = strs.begin(); it<strs.end(); ++it)
+	//assert(this->topology[child_name].IsObject());
 	for(Value& v : config)
 	{//iterate node
 		//"node-index", "relative"/["index", "update", "append"]
@@ -187,7 +201,7 @@ void NetRootTree::expand_config(Value::Array &config, char const *child_name)
 		}
 
 		//remove useless item to assemble *config*
-		v.RemoveMember("node-index");
+		v.RemoveMember("node-index"); //remove for children's usage
 		for(int k=__start; k<=__end; ++k)
 		{//iterate certain apply
 			this->pNext[k] = \
@@ -196,6 +210,7 @@ void NetRootTree::expand_config(Value::Array &config, char const *child_name)
 	}
 }
 
+/* Expand Template Here */
 void NetRootTree::expand_template(Value &ref, Value &tmpl)
 {
 	char path[255];
@@ -288,7 +303,7 @@ void NetRootTree::printLayers()
 
 void NetRootTree::HierPrint(char const *str, string const &type="default")
 {
-	string m_indent(this->layer, '\t');
+	string m_indent(this->layer * 4, ' ');
 	switch(PrintHelper[type])
 	{
 	case 0:
@@ -298,7 +313,7 @@ void NetRootTree::HierPrint(char const *str, string const &type="default")
 		printf("%s%s\n", m_indent.c_str(), str);
 		break;
 	default:
-		printf("\t%s%s\n", m_indent.c_str(), str);
+		printf("%s%s%s\n", m_indent.c_str(), m_indent.c_str(), str);
 		break;
 	}
 }
