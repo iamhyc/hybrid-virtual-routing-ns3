@@ -55,6 +55,8 @@ namespace ns3_net
 		int getLayer() const;
 		void HierPrint(char const *str, std::string const &type);
 		void printLayers();
+		void expand_chidren(void);
+		void expand_config(rapidjson::Value::Array &config, char const *child_name);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
 		std::string getName() const;
 		NetRootTree const *getNextByIndex(const int) const;

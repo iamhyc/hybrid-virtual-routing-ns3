@@ -124,58 +124,76 @@ void NetRootTree::construct()
 
 	HierPrint(this->GroupName.c_str(), "build");
 	/* Iterate (NetRootTree *next) Here */
+	expand_chidren();
+	findMemberName(&this->topology, "inter", tmp);
+	findMemberName(&this->topology, "outer", tmp); //TODO:add outer link callback
+}
+
+void NetRootTree::expand_chidren()
+{
+	StringVector tmp;
 	findMemberName(&this->topology, "node", tmp);
+
 	for(auto it = tmp.begin(); it<tmp.end(); ++it)
 	{//iterate node group
-		char const *name = move(it->c_str());
+		char const *child_name = move(it->c_str());
 		NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
 
 		//"node-number" is Number; "node-config" is Array
-		assert(this->topology[name].IsObject());
-		assert(this->physical[name].IsObject());
-		auto nNodes = this->physical[name]["node-number"].GetInt();
-		auto config = this->physical[name]["node-config"].GetArray();
+		assert(this->topology[child_name].IsObject());
+		assert(this->physical[child_name].IsObject());
+		auto nNodes = this->physical[child_name]["node-number"].GetInt();
+		auto config = this->physical[child_name]["node-config"].GetArray();
 		/* Create Nodes Hierarchical */
 		tuple.nodes.Create(nNodes);
 		this->pNext = pNetChildren(nNodes);
-		for(Value& v : config)
-		{//iterate node
-			//"node-index", "relative"/["index", "update", "append"]
-			int __start=0, __end=0;
-
-			if(v["node-index"].IsInt())
-			{
-				__start = v["node-index"].GetInt();
-				__end = __start;
-			}
-			if(v["node-index"].IsObject())
-			{
-				__start = v["node-index"]["begin"].GetInt();
-				__end = v["node-index"]["end"].GetInt();
-			}
-			sprintf(build_log, "Config[%d, %d]", __start, __end);
-			HierPrint(build_log, "default");
-
-			// printf("(%d, %d)\n", __start, __end);
-			if(v.HasMember("relative"))
-			{
-				int index = v["relative"]["index"].GetInt();
-				expand_template(config[index], v);
-			}
-
-			//remove useless item to assemble *config*
-			v.RemoveMember("node-index");
-			for(int k=__start; k<=__end; ++k)
-			{//iterate certain apply
-				this->pNext[k] = \
-					new NetRootTree(this->doc, this->topology[name], v, this->layer + 1, name);
-			}
+		if(config.Empty())
+		{
+			HierPrint("End Of File", "default");
+		}
+		else
+		{
+			expand_config(config, child_name);
 		}
 		/* Create Network Devices */
 		findMemberName(&this->topology, "intra", tmp);
 	}
-	findMemberName(&this->topology, "inter", tmp);
-	findMemberName(&this->topology, "outer", tmp); //TODO:add outer link callback
+}
+
+void NetRootTree::expand_config(Value::Array &config, char const *child_name)
+{
+	int __start=0, __end=0;
+
+	for(Value& v : config)
+	{//iterate node
+		//"node-index", "relative"/["index", "update", "append"]
+		if(v["node-index"].IsInt())
+		{
+			__start = v["node-index"].GetInt();
+			__end = __start;
+		}
+		else if(v["node-index"].IsObject())
+		{
+			__start = v["node-index"]["begin"].GetInt();
+			__end = v["node-index"]["end"].GetInt();
+		}
+		sprintf(build_log, "Config[%d, %d]", __start, __end);
+		HierPrint(build_log, "default");
+
+		if(v.HasMember("relative"))
+		{
+			int index = v["relative"]["index"].GetInt();
+			expand_template(config[index], v);
+		}
+
+		//remove useless item to assemble *config*
+		v.RemoveMember("node-index");
+		for(int k=__start; k<=__end; ++k)
+		{//iterate certain apply
+			this->pNext[k] = \
+				new NetRootTree(this->doc, this->topology[child_name], v, this->layer + 1, child_name);
+		}
+	}
 }
 
 void NetRootTree::expand_template(Value &ref, Value &tmpl)
