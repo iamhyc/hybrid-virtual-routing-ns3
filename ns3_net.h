@@ -45,6 +45,7 @@ namespace ns3_net
 	{
 	public:
 		typedef std::vector<NetRootTree *> pNetChildren;
+		typedef std::vector<pNetChildren> pNetChildrenList;
 	//construct
 		NetRootTree(char const *path);
 		NetRootTree(rapidjson::Document *,rapidjson::Value &, rapidjson::Value &, \
@@ -59,9 +60,9 @@ namespace ns3_net
 		void expand_config(rapidjson::Value::Array &config, StringVector &Children);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
 		std::string getName() const;
-		NetRootTree const *getNextByIndex(const int) const;
-		NetRootTree const *getNextByName(char const *) const;
-		NetRootTree const *getByGroupName(char const *) const;
+		void getNextByIndex(const int, pNetChildren &);
+		// void getNextByName(char const *, pNetChildren &); //ABANDON
+		void getByGroupName(char const *, pNetChildren &);
 	//virtual function
 		virtual void applyApplications();
 
@@ -75,7 +76,7 @@ namespace ns3_net
 		rapidjson::Value topology, physical;
 	//relationship
 		InterGroupMap map;		//interconnection
-		pNetChildren pNext;		//to sublayer
+		pNetChildrenList pNext;		//to sublayer
 	};
 
 }

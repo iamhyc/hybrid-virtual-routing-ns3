@@ -129,8 +129,8 @@ void NetRootTree::construct()
 	{
 		//bypass root device here; (now, "node-root" is FALSE as default)
 		char const *name = strs[0].c_str();
-		this->pNext = pNetChildren(1);
-		this->pNext[0] = \
+		this->pNext = pNetChildrenList(1);
+		this->pNext[0][0] = \
 				new NetRootTree(this->doc, this->topology[name], this->physical[name], this->layer + 1, name);
 	}
 	else
@@ -155,7 +155,7 @@ void NetRootTree::expand_children(StringVector &Children)
 
 	/* Create Nodes Hierarchical */
 	tuple.nodes.Create(nNodes);
-	this->pNext = pNetChildren(nNodes);
+	this->pNext = pNetChildrenList(nNodes);
 
 	if(config.Empty())
 	{
@@ -176,8 +176,6 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 {
 	int __start=0, __end=0;
 	//FIXME:pNext SHOULD BE A Vector<Vector<NetRootTree *>>; rewrite iteration
-	//for(auto it = strs.begin(); it<strs.end(); ++it)
-	//assert(this->topology[child_name].IsObject());
 	for(Value& v : config)
 	{//iterate node
 		//"node-index", "relative"/["index", "update", "append"]
@@ -203,9 +201,13 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 		//remove useless item to assemble *config*
 		v.RemoveMember("node-index"); //remove for children's usage
 		for(int k=__start; k<=__end; ++k)
-		{//iterate certain apply
-			this->pNext[k] = \
-				new NetRootTree(this->doc, this->topology[child_name], v, this->layer + 1, child_name);
+		{
+			for(auto it = Children.begin(); it<Children.end(); ++it)
+			{
+				char const *child_name = it->c_str();
+				assert(v[child_name].IsObject());
+				this->pNext[k].push_back(new NetRootTree(this->doc, this->topology[child_name], v, this->layer + 1, child_name));
+			}
 		}
 	}
 }
@@ -260,39 +262,14 @@ string NetRootTree::getName() const
 	return this->GroupName;
 }
 
-NetRootTree const *NetRootTree::getNextByIndex(const int num) const
+void NetRootTree::getNextByIndex(const int num, pNetChildren &children)
 {
-	return this->pNext[num];
+	children = this->pNext[num];
 }
 
-NetRootTree const *NetRootTree::getNextByName(char const *name) const
+void NetRootTree::getByGroupName(char const *name, pNetChildren &children)
 {
-	if(strcmp(name, this->GroupName.c_str())==0)
-	{
-		return this;
-	}
-
-	for(auto it=this->pNext.begin(); it!=this->pNext.end(); it++)
-	{
-		if((*it)->getName().compare(name)==0)
-		{
-			return *it;
-		}
-	}
-	return NULL;
-}
-
-const NetRootTree *NetRootTree::getByGroupName(char const *name) const
-{
-	for(auto it=this->pNext.begin(); it!=this->pNext.end(); it++)
-	{
-		auto ptr = (*it)->getByGroupName(name);
-		if(ptr!=NULL)
-		{
-			return ptr;
-		}
-	}
-	return NULL;
+	//TODO:join same GroupName under different config(children)
 }
 
 void NetRootTree::printLayers()
