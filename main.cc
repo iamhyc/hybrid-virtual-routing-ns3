@@ -17,6 +17,7 @@
 #include "ns3_helper.h"
 #include "ns3_perf.h"
 
+using namespace std;
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("HybridVirtualRouting");
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
 	 * // 4.Application Install
 	 * // 5.Connect trace sources and sinks
 	*/
-	auto json_file = "examples/main/json/main.json";
+	auto json_file = "examples/main/json/test.json";
 	ns3_net::NetRootTree rt(json_file);
 	// rt.printLayers();
 

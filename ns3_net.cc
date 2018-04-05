@@ -80,10 +80,11 @@ NetRootTree::~NetRootTree()
 	if(this->GroupName.compare("root")==0)
 	{
 		HierPrint("__root_exit__", "inline");
-		for(auto it=this->pNext.begin(); it<this->pNext.end();++it)
-		{
-			delete &(*it);
-		}
+		//TODO: destruct RT pointer
+		// for(auto it=this->pNext.begin(); it<this->pNext.end();++it)
+		// {
+		// 	delete &(*it);
+		// }
 	}
 	else
 	{
@@ -121,7 +122,7 @@ void NetRootTree::construct()
 {
 	// int count = 0;
 	StringVector strs;
-	findMemberName(&this->topology, "node", strs);
+	findMemberName(this->topology, "node", strs);
 
 	HierPrint(this->GroupName.c_str(), "build");
 
@@ -130,28 +131,28 @@ void NetRootTree::construct()
 		//bypass root device here; (now, "node-root" is FALSE as default)
 		char const *name = strs[0].c_str();
 		this->pNext = pNetChildrenList(1);
-		this->pNext[0][0] = \
-				new NetRootTree(this->doc, this->topology[name], this->physical[name], this->layer + 1, name);
+		this->pNext[0].push_back(new NetRootTree(
+			this->doc, (*this->topology)[name], (*this->physical)[name], this->layer + 1, name));
 	}
 	else
 	{
 		expand_children(strs);
 	}
-	findMemberName(&this->topology, "inter", strs); //TODO:ass inter link
-	findMemberName(&this->topology, "outer", strs); //TODO:add outer link callback
+	findMemberName(this->topology, "inter", strs); //TODO:ass inter link
+	findMemberName(this->topology, "outer", strs); //TODO:add outer link callback
 }
 
 /* 1. Iterate (NetRootTree *next) Here */
 void NetRootTree::expand_children(StringVector &Children)
 {
 	//"node-number" is Number; "node-config" is Array
-	assert(this->physical["node-number"].IsInt());
-	assert(this->physical["node-config"].IsArray());
+	assert((*this->physical)["node-number"].IsInt());
+	assert((*this->physical)["node-config"].IsArray());
 
 	StringVector strs;
 	NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
-	auto nNodes = this->physical["node-number"].GetInt();
-	auto config = this->physical["node-config"].GetArray();
+	auto nNodes = (*this->physical)["node-number"].GetInt();
+	auto config = (*this->physical)["node-config"].GetArray();
 
 	/* Create Nodes Hierarchical */
 	tuple.nodes.Create(nNodes);
@@ -159,7 +160,7 @@ void NetRootTree::expand_children(StringVector &Children)
 
 	if(config.Empty())
 	{
-		HierPrint("End Of File", "default");
+		HierPrint("End Of Network", "default");
 	}
 	else
 	{
@@ -167,7 +168,7 @@ void NetRootTree::expand_children(StringVector &Children)
 	}
 	
 	/* Create Network Devices */
-	findMemberName(&this->topology, "intra", strs);
+	findMemberName(this->topology, "intra", strs);
 	//TODO:"intra" links establish
 }
 
@@ -189,8 +190,6 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 			__start = v["node-index"]["begin"].GetInt();
 			__end = v["node-index"]["end"].GetInt();
 		}
-		sprintf(build_log, "- Config[%d, %d]", __start, __end);
-		HierPrint(build_log, "default");
 
 		if(v.HasMember("relative"))
 		{
@@ -198,18 +197,19 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 			expand_template(config[index], v);
 		}
 
-		//remove useless item to assemble *config*
-		v.RemoveMember("node-index"); //remove for children's usage
+		sprintf(build_log, "- Config[%d, %d]", __start, __end);
+		HierPrint(build_log, "default");
 		for(int k=__start; k<=__end; ++k)
 		{
 			for(auto it = Children.begin(); it<Children.end(); ++it)
 			{
 				char const *child_name = it->c_str();
-				assert(v[child_name].IsObject());
+				// assert(v[child_name].IsObject());
 				this->pNext[k].push_back(new NetRootTree(this->doc, 
 					(*this->topology)[child_name], v[child_name], this->layer + 1, child_name));
 			}
 		}
+		HierPrint("End Config", "default");
 	}
 }
 
@@ -223,8 +223,6 @@ void NetRootTree::expand_template(Value &ref, Value &tmpl)
 	//Deep Copy to copied DOM
 	tmp.CopyFrom(ref, allocator);
 
-	printDocument("tmp", &ref);
-
 	/* Update operation on temp DOM */
 	if(tmpl["relative"].HasMember("update"))
 	{
@@ -233,7 +231,6 @@ void NetRootTree::expand_template(Value &ref, Value &tmpl)
 		{
 			strcpy(path, m.name.GetString());
 			val = GetValueByPointer(tmp, path);
-			HierPrint("hoho", "default");
 			*val = m.value.Move();
 		}
 	}
