@@ -103,8 +103,8 @@ NetRootTree::NetRootTree(char const *path):
 	documentLint(flag, document);
 	//init
 	this->doc = move(&document);
-	this->topology = (*this->doc)["topology"];
-	this->physical = (*this->doc)["physical"];
+	this->topology = &(*this->doc)["topology"];
+	this->physical = &(*this->doc)["physical"];
 	construct();
 }
 
@@ -112,8 +112,8 @@ NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char
 	layer(layer), GroupName(name)
 {
 	this->doc = doc;
-	this->topology = topo;
-	this->physical = phy;
+	this->topology = &topo;
+	this->physical = &phy;
 	construct();
 }
 
@@ -175,7 +175,7 @@ void NetRootTree::expand_children(StringVector &Children)
 void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 {
 	int __start=0, __end=0;
-	//FIXME:pNext SHOULD BE A Vector<Vector<NetRootTree *>>; rewrite iteration
+
 	for(Value& v : config)
 	{//iterate node
 		//"node-index", "relative"/["index", "update", "append"]
@@ -189,7 +189,7 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 			__start = v["node-index"]["begin"].GetInt();
 			__end = v["node-index"]["end"].GetInt();
 		}
-		sprintf(build_log, "Config[%d, %d]", __start, __end);
+		sprintf(build_log, "- Config[%d, %d]", __start, __end);
 		HierPrint(build_log, "default");
 
 		if(v.HasMember("relative"))
@@ -206,7 +206,8 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 			{
 				char const *child_name = it->c_str();
 				assert(v[child_name].IsObject());
-				this->pNext[k].push_back(new NetRootTree(this->doc, this->topology[child_name], v, this->layer + 1, child_name));
+				this->pNext[k].push_back(new NetRootTree(this->doc, 
+					(*this->topology)[child_name], v[child_name], this->layer + 1, child_name));
 			}
 		}
 	}
@@ -222,6 +223,8 @@ void NetRootTree::expand_template(Value &ref, Value &tmpl)
 	//Deep Copy to copied DOM
 	tmp.CopyFrom(ref, allocator);
 
+	printDocument("tmp", &ref);
+
 	/* Update operation on temp DOM */
 	if(tmpl["relative"].HasMember("update"))
 	{
@@ -230,6 +233,7 @@ void NetRootTree::expand_template(Value &ref, Value &tmpl)
 		{
 			strcpy(path, m.name.GetString());
 			val = GetValueByPointer(tmp, path);
+			HierPrint("hoho", "default");
 			*val = m.value.Move();
 		}
 	}
@@ -274,8 +278,8 @@ void NetRootTree::getByGroupName(char const *name, pNetChildren &children)
 
 void NetRootTree::printLayers()
 {
-	printDocument("topology", &(this->topology));
-	printDocument("physical", &(this->physical));
+	printDocument("topology", this->topology);
+	printDocument("physical", this->physical);
 }
 
 void NetRootTree::HierPrint(char const *str, string const &type="default")
@@ -290,7 +294,7 @@ void NetRootTree::HierPrint(char const *str, string const &type="default")
 		printf("%s%s\n", m_indent.c_str(), str);
 		break;
 	default:
-		printf("%s%s%s\n", m_indent.c_str(), m_indent.c_str(), str);
+		printf("%s%s%s\n", "    ", m_indent.c_str(), str);
 		break;
 	}
 }

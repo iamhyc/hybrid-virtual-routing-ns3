@@ -73,7 +73,7 @@ namespace ns3_net
 		NodesTupleContainer group;
 	//const DOM
 		rapidjson::Document* doc;
-		rapidjson::Value topology, physical;
+		rapidjson::Value *topology, *physical;
 	//relationship
 		InterGroupMap map;		//interconnection
 		pNetChildrenList pNext;		//to sublayer
