@@ -2,6 +2,12 @@
 #define __NS3_HELPER_H__
 
 #define UNUSED(x) (void)(x)
+#define R_T(x)	"\033[31m" x "\033[0m"
+#define G_T(x)	"\033[32m" x "\033[0m"
+#define Y_T(x)	"\033[33m" x "\033[0m"
+#define B_T(x)	"\033[34m" x "\033[0m"
+#define M_T(x)	"\033[35m" x "\033[0m"
+#define C_T(x)	"\033[36m" x "\033[0m"
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"

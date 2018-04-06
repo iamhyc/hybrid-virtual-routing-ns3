@@ -11,7 +11,8 @@ map<string, int> PrintHelper=
 {
 		{"default",		-1},
 		{"build",		0},
-		{"inline",		1}
+		{"inline",		1},
+		{"config",		2}
 };
 
 void getNameBySplitter(char const *message, char const *splitter, StringVector &tokens)
@@ -63,6 +64,7 @@ void printDocument(char const *name, Value const *doc, int layer=0)
 
 void findMemberName(Value const *doc, const std::string name, StringVector &output)
 {
+	output.clear(); output.swap(output);
 	for(auto& m : doc->GetObject())
 	{
 		string tmp(m.name.GetString());
@@ -107,6 +109,7 @@ NetRootTree::NetRootTree(char const *path):
 	this->topology = &(*this->doc)["topology"];
 	this->physical = &(*this->doc)["physical"];
 	construct();
+	HierPrint(C_T("End Building"), "inline");
 }
 
 NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char const *name):
@@ -116,6 +119,7 @@ NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char
 	this->topology = &topo;
 	this->physical = &phy;
 	construct();
+	HierPrint("|" C_T("<=="), "inline");
 }
 
 void NetRootTree::construct()
@@ -149,13 +153,12 @@ void NetRootTree::expand_children(StringVector &Children)
 	assert((*this->physical)["node-number"].IsInt());
 	assert((*this->physical)["node-config"].IsArray());
 
-	StringVector strs;
-	NodesTuple tuple = {.id=0}; //TODO:*id* currently not used
+	this->group = {.id=0}; //TODO:*id* currently not used
 	auto nNodes = (*this->physical)["node-number"].GetInt();
 	auto config = (*this->physical)["node-config"].GetArray();
 
 	/* Create Nodes Hierarchical */
-	tuple.nodes.Create(nNodes);
+	this->group.nodes.Create(nNodes);
 	this->pNext = pNetChildrenList(nNodes);
 
 	if(config.Empty())
@@ -166,15 +169,12 @@ void NetRootTree::expand_children(StringVector &Children)
 	{
 		expand_config(config, Children);
 	}
-	
-	/* Create Network Devices */
-	findMemberName(this->topology, "intra", strs);
-	//TODO:"intra" links establish
 }
 
 /* 2. Expand Specified Config Here */
 void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 {
+	StringVector strs;
 	int __start=0, __end=0;
 
 	for(Value& v : config)
@@ -197,19 +197,23 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 			expand_template(config[index], v);
 		}
 
-		sprintf(build_log, "- Config[%d, %d]", __start, __end);
-		HierPrint(build_log, "default");
+		sprintf(build_log, Y_T("Config[%d, %d]"), __start, __end);
+		HierPrint(build_log, "config");
 		for(int k=__start; k<=__end; ++k)
 		{
 			for(auto it = Children.begin(); it<Children.end(); ++it)
 			{
 				char const *child_name = it->c_str();
-				// assert(v[child_name].IsObject());
+				assert(v[child_name].IsObject());
 				this->pNext[k].push_back(new NetRootTree(this->doc, 
 					(*this->topology)[child_name], v[child_name], this->layer + 1, child_name));
+				
+				/* Create Network Devices */
+				findMemberName(this->topology, "intra", strs);
+				//TODO:"intra" links establish
 			}
 		}
-		HierPrint("End Config", "default");
+		// HierPrint("|" Y_T("<=="), "inline");
 	}
 }
 
@@ -273,25 +277,29 @@ void NetRootTree::getByGroupName(char const *name, pNetChildren &children)
 	//TODO:join same GroupName under different config(children)
 }
 
-void NetRootTree::printLayers()
-{
-	printDocument("topology", this->topology);
-	printDocument("physical", this->physical);
-}
-
 void NetRootTree::HierPrint(char const *str, string const &type="default")
 {
-	string m_indent(this->layer * 4, ' ');
+	string padding = "|\x20\x20\x20";
+	string m_indent("");
+	m_indent.reserve(this->layer*4);
+	for(int i = 0; i < this->layer; ++i)
+	{
+		m_indent += padding;
+	}
+	
 	switch(PrintHelper[type])
 	{
 	case 0:
-		printf("%sBuilding <%s>: \n", m_indent.c_str(), str);	
+		printf("%s%s <" M_T("%s") ">: \n", m_indent.c_str(), C_T("Building"), str);
 		break;
 	case 1:
 		printf("%s%s\n", m_indent.c_str(), str);
 		break;
+	case 2:
+		printf("%s%s%s\n", m_indent.c_str(), "|"  Y_T("==>"), str);
+		break;
 	default:
-		printf("%s%s%s\n", "    ", m_indent.c_str(), str);
+		printf("%s%s%s\n", m_indent.c_str(), padding.c_str(), str);
 		break;
 	}
 }

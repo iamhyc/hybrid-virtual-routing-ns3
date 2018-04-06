@@ -57,8 +57,10 @@ int main(int argc, char *argv[])
 	ns3_net::NetRootTree rt(json_file);
 	// rt.printLayers();
 
-	//6.Simulator Setup 
-	Time::SetResolution(Time::NS);
+	//6.Simulator Setup
+	// Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+	// Simulator::Stop (Seconds(10.0));
+	// Time::SetResolution(Time::NS);
 	if (!quiet)
 	{
 		// ChannelHelper.EnablePcapAll("main");

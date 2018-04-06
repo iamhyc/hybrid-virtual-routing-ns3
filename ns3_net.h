@@ -55,7 +55,6 @@ namespace ns3_net
 	//helper function
 		int getLayer() const;
 		void HierPrint(char const *str, std::string const &type);
-		void printLayers();
 		void expand_children(StringVector &Children);
 		void expand_config(rapidjson::Value::Array &config, StringVector &Children);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
@@ -70,7 +69,7 @@ namespace ns3_net
 	//id
 		int layer;
 		std::string GroupName;
-		NodesTupleContainer group;
+		NodesTuple group;
 	//const DOM
 		rapidjson::Document* doc;
 		rapidjson::Value *topology, *physical;
