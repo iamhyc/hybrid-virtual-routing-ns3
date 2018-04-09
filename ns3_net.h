@@ -16,7 +16,7 @@
 typedef std::vector<std::string> StringVector;
 
 extern const char* kTypeNames[];
-void HierPrint(std::string const &str, int layer, std::string const &type);
+void HierPrint(std::string const &str, std::string const &type, int layer);
 bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
@@ -59,6 +59,7 @@ namespace ns3_net
 		void expand_config(rapidjson::Value::Array &config, StringVector &Children);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
 		std::string getName() const;
+		void expand_links(NS3Link type, Nodes const &p2pNodes, Nets &p2pDevices, Ifaces &p2pIfaces);
 		void getNextByIndex(const int, pNetChildren &);
 		// void getNextByName(char const *, pNetChildren &); //ABANDON
 		void getByGroupName(char const *, pNetChildren &);

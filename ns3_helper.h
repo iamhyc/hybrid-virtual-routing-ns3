@@ -26,6 +26,8 @@ namespace ns3_helper
 	typedef NetDeviceContainer		Nets;
 	typedef Ipv4InterfaceContainer	Ifaces;
 
+	enum NS3Link {P2P, CSMA, WIFI};
+
 	typedef struct generalSchema
 	{
 		float throughput;

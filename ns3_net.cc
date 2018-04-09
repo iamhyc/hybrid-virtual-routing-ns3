@@ -208,12 +208,31 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 				this->pNext[k].push_back(new NetRootTree(this->doc, 
 					(*this->topology)[child_name], v[child_name], this->layer + 1, child_name));
 				
+				// expand_intra_link();
+
 				/* Create Network Devices */
 				findMemberName(this->topology, "intra", strs);
-				//TODO:"intra" links establish
+				
 			}
 		}
 		// HierPrint("|" Y_T("<=="), "inline");
+	}
+}
+
+void NetRootTree::expand_links(NS3Link type, Nodes const &p2pNodes, Nets &p2pDevices, Ifaces &p2pIfaces)
+{
+	switch(type)
+	{
+		case NS3Link::P2P:
+			break;
+		case NS3Link::CSMA:
+			break;
+		case NS3Link::WIFI:
+			break;
+		default:
+			sprintf(build_log, "not supported link: %s", "none");
+			HierPrint(build_log, "default");
+			break;
 	}
 }
 
