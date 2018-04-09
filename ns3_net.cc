@@ -9,16 +9,32 @@ const char* kTypeNames[] =
 	{ "Null", "False", "True", "Object", "Array", "String", "Number" };
 map<string, int> PrintHelper=
 {
-		{"default",		-1},
-		{"build",		0},
-		{"inline",		1},
-		{"config",		2}
+	{"default",		-1},
+	{"build",		0},
+	{"inline",		1},
+	{"config",		2},
+	{"inlined",		3},
 };
 
-void getNameBySplitter(char const *message, char const *splitter, StringVector &tokens)
+void getSplitName(char const *message, char const *splitter, StringVector &tokens)
 {
-	/*e.g. getNamebySplitter("ipBase", "_", tokens); ("device", "-", tokens)*/
+	tokens.clear();
 	boost::split(tokens, message, boost::is_any_of(splitter));
+}
+
+void getSplitName(StringVector &tokens, char const *splitter)
+{
+	StringVector tmp, output;
+
+	for(auto it=tokens.begin();it!=tokens.end();++it)
+	{
+		boost::split(tmp, *it, boost::is_any_of(splitter));
+		if (tmp.size()==2)
+		{
+			output.push_back(tmp[1]);
+		}
+	}
+	tokens.swap(output);
 }
 
 bool documentLint(bool flag, Document const &json)
@@ -76,12 +92,18 @@ void findMemberName(Value const *doc, const std::string name, StringVector &outp
 }
 
 using namespace ns3_net;
+map<string, NS3Link> NS3LinkMap=
+{
+	{"link-p2p",	NS3Link::P2P},
+	{"link-csma",	NS3Link::CSMA},
+	{"link-wifi",	NS3Link::WIFI},
+};
 
 NetRootTree::~NetRootTree()
 {
 	if(this->GroupName.compare("root")==0)
 	{
-		HierPrint("__root_exit__", "inline");
+		printf("__root_exit__\n");
 		//TODO: destruct RT pointer
 		// for(auto it=this->pNext.begin(); it<this->pNext.end();++it)
 		// {
@@ -109,7 +131,7 @@ NetRootTree::NetRootTree(char const *path):
 	this->topology = &(*this->doc)["topology"];
 	this->physical = &(*this->doc)["physical"];
 	construct();
-	HierPrint(C_T("End Building"), "inline");
+	HierPrint(C_T("<=="), "inline");
 }
 
 NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char const *name):
@@ -119,7 +141,7 @@ NetRootTree::NetRootTree(Document *doc, Value &topo, Value &phy, int layer, char
 	this->topology = &topo;
 	this->physical = &phy;
 	construct();
-	HierPrint("|" C_T("<=="), "inline");
+	HierPrint(C_T("<=="), "inline");
 }
 
 void NetRootTree::construct()
@@ -135,8 +157,9 @@ void NetRootTree::construct()
 		//bypass root device here; (now, "node-root" is FALSE as default)
 		char const *name = strs[0].c_str();
 		this->pNext = pNetChildrenList(1);
-		this->pNext[0].push_back(new NetRootTree(
-			this->doc, (*this->topology)[name], (*this->physical)[name], this->layer + 1, name));
+		getSplitName(name, "-", strs);
+		this->pNext[0].push_back(new NetRootTree(this->doc,
+			(*this->topology)[name], (*this->physical)[name], this->layer + 1, strs[1].c_str()));
 	}
 	else
 	{
@@ -153,11 +176,11 @@ void NetRootTree::expand_children(StringVector &Children)
 	assert((*this->physical)["node-number"].IsInt());
 	assert((*this->physical)["node-config"].IsArray());
 
-	this->group = {.id=0}; //TODO:*id* currently not used
 	auto nNodes = (*this->physical)["node-number"].GetInt();
 	auto config = (*this->physical)["node-config"].GetArray();
 
 	/* Create Nodes Hierarchical */
+	this->group.id = static_cast<uint32_t>(rand()&0xFF);
 	this->group.nodes.Create(nNodes);
 	this->pNext = pNetChildrenList(nNodes);
 
@@ -203,36 +226,64 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 		{
 			for(auto it = Children.begin(); it<Children.end(); ++it)
 			{
-				char const *child_name = it->c_str();
+				char child_name[255];
+				strncpy(child_name, it->c_str(), 255);
 				assert(v[child_name].IsObject());
+				
+				getSplitName(child_name, "-", strs);
 				this->pNext[k].push_back(new NetRootTree(this->doc, 
-					(*this->topology)[child_name], v[child_name], this->layer + 1, child_name));
+					(*this->topology)[child_name], v[child_name], this->layer + 1, strs[1].c_str()));
 				
-				// expand_intra_link();
-
 				/* Create Network Devices */
-				findMemberName(this->topology, "intra", strs);
-				
+				sprintf(child_name, "%s-%s", "intra", strs[1].c_str()); //reuse child_name
+				if(this->topology->HasMember(child_name))
+				{
+					assert(v.HasMember(child_name));
+					expand_links(v[child_name], k, child_name); //"intra-link"
+				}
 			}
 		}
-		// HierPrint("|" Y_T("<=="), "inline");
+		// HierPrint(Y_T("<=="), "inline"); //ABANDON
 	}
 }
 
-void NetRootTree::expand_links(NS3Link type, Nodes const &p2pNodes, Nets &p2pDevices, Ifaces &p2pIfaces)
+/* Expand Intra & Outer Links here */
+void NetRootTree::expand_links(Value &links, int index, char const* child_name)
 {
-	switch(type)
+	// StringVector strs;
+	auto link_enum = (*this->topology)[child_name].GetArray();
+	
+	for(Value& v : link_enum)
 	{
-		case NS3Link::P2P:
-			break;
-		case NS3Link::CSMA:
-			break;
-		case NS3Link::WIFI:
-			break;
-		default:
-			sprintf(build_log, "not supported link: %s", "none");
-			HierPrint(build_log, "default");
-			break;
+		// Get Link Name
+		auto link_type = v.GetString();
+		assert(links.HasMember(link_type));
+
+		// Get Link Template
+		auto templ_name = links[link_type].GetString();
+		assert((*this->doc)["template"].HasMember(templ_name));
+		auto link_templ = (*this->doc)["template"][templ_name].GetObject();
+
+		// Get NodeTuples of (this) and (Child)
+		NetRootTree *child = this->pNext[index].back();
+		Nodes node_t(child->group.nodes); node_t.Add(this->group.nodes.Get(index));
+		//FIXME:fix Nets and Ifaces definition
+
+		switch(NS3LinkMap[ string(link_type) ]) {
+			case NS3Link::P2P:
+				HierPrint(G_T("-->|P2P|"), "inline");
+				break;
+			case NS3Link::CSMA:
+				HierPrint(G_T("-->|CSMA|"), "inline");
+				break;
+			case NS3Link::WIFI:
+				HierPrint(G_T("-->|WiFi|"), "inline");
+				break;
+			default:
+				sprintf(build_log, "not supported link: %s", link_type);
+				HierPrint(build_log, "default");
+				break;
+		}
 	}
 }
 
@@ -308,14 +359,17 @@ void NetRootTree::HierPrint(char const *str, string const &type="default")
 	
 	switch(PrintHelper[type])
 	{
-	case 0:
-		printf("%s%s <" M_T("%s") ">: \n", m_indent.c_str(), C_T("Building"), str);
+	case 0:	//build
+		printf("%s" C_T("<%s>: \n"), m_indent.c_str(), str);
 		break;
-	case 1:
-		printf("%s%s\n", m_indent.c_str(), str);
+	case 1:	//inline
+		printf("%s|%s\n", m_indent.c_str(), str);
 		break;
-	case 2:
+	case 2:	//config
 		printf("%s%s%s\n", m_indent.c_str(), "|"  Y_T("==>"), str);
+		break;
+	case 3:	//inlined
+		printf("%s%s", m_indent.c_str(), str);
 		break;
 	default:
 		printf("%s%s%s\n", m_indent.c_str(), padding.c_str(), str);

@@ -11,20 +11,22 @@
 	},
 	
 	"physical": {
-		"link-csma": "template_csma",
+		"link-csma-router": "template_csma",
 		"node-router": {
 			"node-number": 2,
 			"node-config": [
 				{
 					"node-index": {"begin":0, "end":1},
-					"link-p2p": "template_p2p",
-					"link-wifi": "template_wifi_A",
+					"intra-relay": {
+						"link-p2p": "template_p2p",
+						"link-wifi": "template_wifi_A"
+					},
 					"node-relay": {
 						"node-number": 1,
 						"node-config": [
 							{
 								"node-index":0,
-								"link-wifi": "template_wifi_B",
+								"intra-client": {"link-wifi": "template_wifi_B"},
 								"node-client": {
 									"node-number": 5,
 									"node-config": []

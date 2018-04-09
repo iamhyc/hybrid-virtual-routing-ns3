@@ -21,7 +21,8 @@ bool documentLint(rapidjson::Document const *json);
 void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 
 void findMemberName(rapidjson::Value const *, const std::string name, StringVector &); //with wildcard
-void getNameBySplitter(char const *, char const *, StringVector &);
+void getSplitName(StringVector &, char const *splitter);
+void getSplitName(char const *message, char const *splitter, StringVector &);
 
 namespace ns3_net
 {
@@ -54,23 +55,25 @@ namespace ns3_net
 		void construct();
 	//helper function
 		int getLayer() const;
+		std::string getName() const;
 		void HierPrint(char const *str, std::string const &type);
 		void expand_children(StringVector &Children);
 		void expand_config(rapidjson::Value::Array &config, StringVector &Children);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
-		std::string getName() const;
-		void expand_links(NS3Link type, Nodes const &p2pNodes, Nets &p2pDevices, Ifaces &p2pIfaces);
+		void expand_links(rapidjson::Value &, int index, char const* child_name);
 		void getNextByIndex(const int, pNetChildren &);
 		// void getNextByName(char const *, pNetChildren &); //ABANDON
 		void getByGroupName(char const *, pNetChildren &);
 	//virtual function
 		virtual void applyApplications();
 
+	public:
+		NodesTuple group;
+
 	private:
 	//id
 		int layer;
 		std::string GroupName;
-		NodesTuple group;
 	//const DOM
 		rapidjson::Document* doc;
 		rapidjson::Value *topology, *physical;

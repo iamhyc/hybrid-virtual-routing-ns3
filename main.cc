@@ -9,7 +9,22 @@
  * 3. vlc-p2p-relay-wifi-hybrid
  * 4. vlc-p2m-relay-wifi
  * 5. wifi-p2p-relay-wifi
- */
+ *
+ * {Node, Channel, Device, Stack, Address, Interface, Service, Application}
+ * // 0.Set default attributes and random seed
+ * // 1.Node Container Setup
+ * 		using ns3::NodeContainer
+ * 		Create(); Add(); Get();
+ * // 2.Channel Helper Setup
+ * 		helper.Install(NodeContainer);
+ * // 3.Internet Stack Install
+ * 		stack.install(NodeContainer)
+ * 		address.setBase("Interface", "NetMask");
+ * 		address.Assign(NetDeviceContainer);
+ * // 4.Application Install
+ * // 5.Connect trace sources and sinks
+*/
+
 #include <unistd.h>
 #include <iostream>
 
@@ -39,20 +54,7 @@ int main(int argc, char *argv[])
 	cmd.AddValue("quiet", "Tell echo applications to log if true", quiet);
 	cmd.Parse(argc, argv);
 
-	/* {Node, Channel, Device, Stack, Address, Interface, Service, Application}
-	 * // 0.Set default attributes and random seed
-	 * // 1.Node Container Setup
-	 * 		using ns3::NodeContainer
-	 * 		Create(); Add(); Get();
-	 * // 2.Channel Helper Setup
-	 * 		helper.Install(NodeContainer);
-	 * // 3.Internet Stack Install
-	 * 		stack.install(NodeContainer)
-	 * 		address.setBase("Interface", "NetMask");
-	 * 		address.Assign(NetDeviceContainer);
-	 * // 4.Application Install
-	 * // 5.Connect trace sources and sinks
-	*/
+	srand(time(NULL));
 	auto json_file = "examples/main/json/test.json";
 	ns3_net::NetRootTree rt(json_file);
 	// rt.printLayers();
