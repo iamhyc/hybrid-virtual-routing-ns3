@@ -31,7 +31,6 @@ namespace ns3_net
 
 	const int ipAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 
-	typedef std::vector<NodesTuple> NodesTupleContainer;
 	typedef std::map<uint32_t, std::vector<uint32_t>> InterGroupMap; //NodeTypeId-->{NodesTupleId}
 
 	class NetRootTree

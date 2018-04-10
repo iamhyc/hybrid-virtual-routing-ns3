@@ -1,5 +1,6 @@
 
 #include "ns3_helper.h"
+#include <arpa/inet.h>
 
 using namespace ns3_helper;
 
@@ -13,6 +14,8 @@ static WifiMacHelper		wifi_mac;
 static MobilityHelper		mobility;
 static WiFiManager wifi_manager;
 // service helper
+static uint32_t addr_counter = 0;
+static uint32_t addr_base = inet_addr("10.0.0.0");
 static InternetStackHelper stack;
 static Ipv4AddressHelper address;
 
@@ -21,11 +24,28 @@ void ns3_helper::InstallStackHelper(Nodes& nodes)
 	stack.Install(nodes);
 }
 
+void IPHelper(char const *base)
+{
+	char IPAddr[20];
+	struct in_addr s;
+	strncpy(IPAddr, base, strlen(base));
+	inet_pton(AF_INET, IPAddr, &s);
+	inet_ntop(AF_INET, (void *)&s, IPAddr, sizeof(in_addr));
+}
+
 void ns3_helper::p2pBuilder(KeyPair keyword, flowSchema schema, NodesTuple& parent, NodesTuple& child)
 {
+	Nets p2pNets;
+	Ifaces p2pIfaces;
+
 	p2pHelper.SetDeviceAttribute("DataRate", StringValue(schema.throughput));
 	p2pHelper.SetChannelAttribute("Delay", StringValue(schema.delay));
-	// p2pDevices = p2pHelper.Install(p2pNodes);
+	for(auto it=child.nodes.Begin();it!=child.nodes.End();++it)
+	{
+		// p2pNets = p2pHelper.Install(p2pNodes);
+		// address.SetBase ("10.1.1.0", "255.255.255.0");
+		// p2pIfaces = address.Assign (p2pNets);
+	}
 }
 
 void ns3_helper::csmaBuilder(KeyPair keyword, flowSchema schema, NodesTuple& parent, NodesTuple& child)
