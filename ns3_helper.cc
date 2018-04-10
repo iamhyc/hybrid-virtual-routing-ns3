@@ -16,18 +16,26 @@ static WiFiManager wifi_manager;
 static InternetStackHelper stack;
 static Ipv4AddressHelper address;
 
-void p2pDefaultHelper(Nodes const &p2pNodes, Nets &p2pDevices, Ifaces &p2pIfaces)
+void ns3_helper::p2pBuilder(KeyPair keyword, flowSchema schema, NodesTuple& parent, NodesTuple& child)
 {
-	p2pHelper.SetDeviceAttribute( "DataRate", StringValue("5Mbps") );
-	p2pHelper.SetChannelAttribute( "Delay", StringValue("2ms") );
-	p2pDevices = p2pHelper.Install(p2pNodes);
+	p2pHelper.SetDeviceAttribute("DataRate", StringValue(schema.throughput));
+	p2pHelper.SetChannelAttribute("Delay", StringValue(schema.delay));
+	// p2pDevices = p2pHelper.Install(p2pNodes);
 }
 
-void csmaDefaultHelper(Nodes const &csmaNodes, Nets &csmaDevices, Ifaces &csmaIfaces)
+void ns3_helper::csmaBuilder(KeyPair keyword, flowSchema schema, NodesTuple& parent, NodesTuple& child)
 {
-	csmaHelper.SetChannelAttribute( "DataRate", StringValue("100Mbps") );
-	csmaHelper.SetChannelAttribute( "Delay", TimeValue(NanoSeconds(6560)) );
-	csmaDevices = csmaHelper.Install(csmaNodes);
+	csmaHelper.SetChannelAttribute("DataRate", StringValue(schema.throughput));
+	csmaHelper.SetChannelAttribute("Delay", StringValue(schema.delay));
+	// csmaDevices = csmaHelper.Install(csmaNodes);
+}
+
+void ns3_helper::wifiBuilder(KeyPair keyword, wifiSchema schema, NodesTuple& parent, NodesTuple& child)
+{
+	UNUSED(keyword);
+	UNUSED(schema);
+	UNUSED(parent);
+	UNUSED(child);
 }
 
 void wifiDefaultHelper(Ptr<Node> const &wifiApNode, Nodes const &wifiStaNodes,

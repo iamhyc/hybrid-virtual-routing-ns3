@@ -31,14 +31,6 @@ namespace ns3_net
 
 	const int ipAddressMask[] = { 0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE };
 
-	typedef struct NodesTuple
-	{
-		uint32_t	id;
-		Nodes		nodes;
-		Nets		nets;
-		Ifaces		ifaces;
-	}NodesTuple_t;
-
 	typedef std::vector<NodesTuple> NodesTupleContainer;
 	typedef std::map<uint32_t, std::vector<uint32_t>> InterGroupMap; //NodeTypeId-->{NodesTupleId}
 
@@ -60,14 +52,14 @@ namespace ns3_net
 		void expand_children(StringVector &Children);
 		void expand_config(rapidjson::Value::Array &config, StringVector &Children);
 		void expand_template(rapidjson::Value &ref, rapidjson::Value &tmpl);
-		void expand_links(rapidjson::Value &, int index, char const* child_name);
+		void expand_links(rapidjson::Value &, int index, char const* child_name, char const *keyword);
 		void getNextByIndex(const int, pNetChildren &);
 		// void getNextByName(char const *, pNetChildren &); //ABANDON
 		void getByGroupName(char const *, pNetChildren &);
 	//virtual function
 		virtual void applyApplications();
 
-	public:
+	protected:
 		NodesTuple group;
 
 	private:

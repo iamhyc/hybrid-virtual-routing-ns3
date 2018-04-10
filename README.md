@@ -82,7 +82,7 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 4. `wafrun main` to run the main simulation
 
 ### Todo
-- [ ] Network JSON Parse
+- [*] Network JSON Parse
 - [ ] Static Routing Strategy
 - [ ] Performance Analysis Callback
 - [ ] Wi-Fi Collision Container

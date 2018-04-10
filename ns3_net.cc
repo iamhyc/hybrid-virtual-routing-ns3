@@ -1,5 +1,6 @@
 
 #include "ns3_net.h"
+#include <regex>
 
 using namespace std;
 using namespace rapidjson;
@@ -239,7 +240,7 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 				if(this->topology->HasMember(child_name))
 				{
 					assert(v.HasMember(child_name));
-					expand_links(v[child_name], k, child_name); //"intra-link"
+					expand_links(v[child_name], k, child_name, "intra"); //"intra-link"
 				}
 			}
 		}
@@ -248,7 +249,7 @@ void NetRootTree::expand_config(Value::Array &config, StringVector &Children)
 }
 
 /* Expand Intra & Outer Links here */
-void NetRootTree::expand_links(Value &links, int index, char const* child_name)
+void NetRootTree::expand_links(Value &links, int index, char const *child_name, char const *keyword)
 {
 	// StringVector strs;
 	auto link_enum = (*this->topology)[child_name].GetArray();
@@ -258,30 +259,55 @@ void NetRootTree::expand_links(Value &links, int index, char const* child_name)
 		// Get Link Name
 		auto link_type = v.GetString();
 		assert(links.HasMember(link_type));
+		flowSchema ftmp;
+		wifiSchema wtmp;
 
 		// Get Link Template
 		auto templ_name = links[link_type].GetString();
 		assert((*this->doc)["template"].HasMember(templ_name));
 		auto link_templ = (*this->doc)["template"][templ_name].GetObject();
-
-		// Get NodeTuples of (this) and (Child)
+		
+		// Get <(keyword, link_type), (this->group, child->group)>
 		NetRootTree *child = this->pNext[index].back();
-		Nodes node_t(child->group.nodes); node_t.Add(this->group.nodes.Get(index));
-		//FIXME:fix Nets and Ifaces definition
-
+		KeyPair key_pair = make_pair(string(keyword), string(link_type));
+		
 		switch(NS3LinkMap[ string(link_type) ]) {
 			case NS3Link::P2P:
-				HierPrint(G_T("-->|P2P|"), "inline");
+				ftmp = {
+					.throughput = link_templ["throughput"].GetString(),
+					.delay		= link_templ["delay"].GetString()
+				};
+				HierPrint(G_T("-->|P2P|"), "inlined");
+				printf(G_T(" (%s, %s)\n"), ftmp.throughput, ftmp.delay);
+				p2pBuilder(key_pair, ftmp, this->group, child->group);
 				break;
 			case NS3Link::CSMA:
-				HierPrint(G_T("-->|CSMA|"), "inline");
+				ftmp = {
+					.throughput = link_templ["throughput"].GetString(),
+					.delay		= link_templ["delay"].GetString()
+				};
+				HierPrint(G_T("-->|CSMA|"), "inlined");
+				printf(G_T(" (%s, %s)\n"), ftmp.throughput, ftmp.delay);
+				csmaBuilder(key_pair, ftmp, this->group, child->group);
 				break;
 			case NS3Link::WIFI:
-				HierPrint(G_T("-->|WiFi|"), "inline");
+				wtmp = {
+					.ssid 		= string(link_templ["ssid"].GetString()),
+					.standard 	= string(link_templ["standard"].GetString()), //IEEE 802.11
+					.mobility	= {0,5,0,0},
+					.channel	= link_templ["channel"].GetInt(),
+					.bandwidth	= link_templ["bandwidth"].GetInt()
+				};
+				wtmp.ssid = regex_replace(wtmp.ssid, regex("%[^ ]*%"), to_string(random()&0xFF));	
+				HierPrint(G_T("-->|WiFi|"), "inlined");
+				printf(G_T(" (%s, Channel: %d)\n"), wtmp.ssid.c_str(), wtmp.channel);
+				wifiBuilder(key_pair, wtmp, this->group, child->group);
 				break;
 			default:
 				sprintf(build_log, "not supported link: %s", link_type);
 				HierPrint(build_log, "default");
+				UNUSED(child);
+				UNUSED(key_pair);
 				break;
 		}
 	}
@@ -369,7 +395,7 @@ void NetRootTree::HierPrint(char const *str, string const &type="default")
 		printf("%s%s%s\n", m_indent.c_str(), "|"  Y_T("==>"), str);
 		break;
 	case 3:	//inlined
-		printf("%s%s", m_indent.c_str(), str);
+		printf("%s|%s", m_indent.c_str(), str);
 		break;
 	default:
 		printf("%s%s%s\n", m_indent.c_str(), padding.c_str(), str);

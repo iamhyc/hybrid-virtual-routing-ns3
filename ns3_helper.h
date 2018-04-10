@@ -21,31 +21,41 @@
 namespace ns3_helper
 {
 	using namespace ns3;
-	typedef std::map<std::string, WifiHelper> WiFiManager;
-	typedef NodeContainer			Nodes;
-	typedef NetDeviceContainer		Nets;
-	typedef Ipv4InterfaceContainer	Ifaces;
 
 	enum NS3Link {P2P, CSMA, WIFI};
 
-	typedef struct generalSchema
+	typedef std::map<std::string, WifiHelper>	WiFiManager;
+	typedef NodeContainer				Nodes;
+	typedef NetDeviceContainer			Nets;
+	typedef Ipv4InterfaceContainer		Ifaces;
+	typedef std::pair<std::string, std::string>			KeyPair; //(Direction, LinkType)
+	typedef std::map<KeyPair, std::pair<Nets, Ifaces>>	NetTupleList;
+
+	typedef struct NodesTuple
 	{
-		float throughput;
-		float delay;
-	}generalSchema_t;
+		uint32_t		id;
+		Nodes			nodes;
+		NetTupleList	netsl;
+	}NodesTuple_t;
+
+	typedef struct flowSchema
+	{
+		char const *throughput;	//with unit, e.g. Mbps
+		char const *delay;		//with unit, e.g. ms
+	}flowSchema_t;
 
 	typedef struct wifiSchema
 	{
-		char* ssid;
-		char* standard;//IEEE 802.11
+		std::string ssid;
+		std::string standard;//IEEE 802.11
 		int mobility[4];
 		int channel;
 		int bandwidth;
 	}wifiSchema_t;
 
-	void p2pDefaultHelper(Nodes const &, Nets &, Ifaces &);
-	void csmaDefaultHelper(Nodes const &, Nets &, Ifaces &);
-	void wifiDefaultHelper(Ptr<Node> const &, Nodes const &, Nets &, Ifaces &);
+	void p2pBuilder(KeyPair, flowSchema, NodesTuple &, NodesTuple &);
+	void csmaBuilder(KeyPair, flowSchema, NodesTuple &, NodesTuple &);
+	void wifiBuilder(KeyPair, wifiSchema, NodesTuple &, NodesTuple &);
 }
 
 #endif
