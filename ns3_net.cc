@@ -93,6 +93,7 @@ void findMemberName(Value const *doc, const std::string name, StringVector &outp
 }
 
 using namespace ns3_net;
+static int random_counter = 0;
 map<string, NS3Link> NS3LinkMap=
 {
 	{"link-p2p",	NS3Link::P2P},
@@ -184,6 +185,7 @@ void NetRootTree::expand_children(StringVector &Children)
 	this->group.id = static_cast<uint32_t>(rand()&0xFF);
 	this->group.nodes.Create(nNodes);
 	this->pNext = pNetChildrenList(nNodes);
+	InstallStackHelper(this->group.nodes);
 
 	if(config.Empty())
 	{
@@ -298,7 +300,7 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 					.channel	= link_templ["channel"].GetInt(),
 					.bandwidth	= link_templ["bandwidth"].GetInt()
 				};
-				wtmp.ssid = regex_replace(wtmp.ssid, regex("%[^ ]*%"), to_string(random()&0xFF));	
+				wtmp.ssid = regex_replace(wtmp.ssid, regex("%[^ ]*%"), to_string(++random_counter));	
 				HierPrint(G_T("-->|WiFi|"), "inlined");
 				printf(G_T(" (%s, Channel: %d)\n"), wtmp.ssid.c_str(), wtmp.channel);
 				wifiBuilder(key_pair, wtmp, this->group, child->group);
@@ -386,7 +388,8 @@ void NetRootTree::HierPrint(char const *str, string const &type="default")
 	switch(PrintHelper[type])
 	{
 	case 0:	//build
-		printf("%s" C_T("<%s>: \n"), m_indent.c_str(), str);
+		printf("%s" C_T("BUILD") " <" M_T("%s") ">: \n", m_indent.c_str(), str);
+		// printf("%s" C_T("<%s>: \n"), m_indent.c_str(), str);
 		break;
 	case 1:	//inline
 		printf("%s|%s\n", m_indent.c_str(), str);

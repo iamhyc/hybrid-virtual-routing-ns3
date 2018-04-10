@@ -16,6 +16,11 @@ static WiFiManager wifi_manager;
 static InternetStackHelper stack;
 static Ipv4AddressHelper address;
 
+void ns3_helper::InstallStackHelper(Nodes& nodes)
+{
+	stack.Install(nodes);
+}
+
 void ns3_helper::p2pBuilder(KeyPair keyword, flowSchema schema, NodesTuple& parent, NodesTuple& child)
 {
 	p2pHelper.SetDeviceAttribute("DataRate", StringValue(schema.throughput));

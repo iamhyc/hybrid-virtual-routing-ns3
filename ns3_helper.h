@@ -53,6 +53,7 @@ namespace ns3_helper
 		int bandwidth;
 	}wifiSchema_t;
 
+	void InstallStackHelper(Nodes& nodes);
 	void p2pBuilder(KeyPair, flowSchema, NodesTuple &, NodesTuple &);
 	void csmaBuilder(KeyPair, flowSchema, NodesTuple &, NodesTuple &);
 	void wifiBuilder(KeyPair, wifiSchema, NodesTuple &, NodesTuple &);
