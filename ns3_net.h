@@ -23,6 +23,7 @@ void printDocument(char const *name, rapidjson::Value const *doc, int layer);
 void findMemberName(rapidjson::Value const *, const std::string name, StringVector &); //with wildcard
 void getSplitName(StringVector &, char const *splitter);
 void getSplitName(char const *message, char const *splitter, StringVector &);
+void expandMobilityArray(rapidjson::Value &, int arr[]);
 
 namespace ns3_net
 {

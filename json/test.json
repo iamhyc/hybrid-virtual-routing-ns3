@@ -52,14 +52,14 @@
 		},
 		"template_wifi_A": {
 			"ssid": "wifi-A-%4%",
-			"mobility": [0,5,0,0],
+			"mobility": [5,5,7,5],
 			"channel": 1,
 			"bandwidth": 20,
 			"standard": "802.11ac"
 		},
 		"template_wifi_B": {
 			"ssid": "wifi-B-%4%",
-			"mobility": [0,5,0,0],
+			"mobility": [2,2,4,2],
 			"channel": 1,
 			"bandwidth": 20,
 			"standard": "802.11ac"

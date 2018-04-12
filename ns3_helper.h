@@ -54,9 +54,10 @@ namespace ns3_helper
 	}wifiSchema_t;
 
 	void InstallStackHelper(Nodes& nodes);
+	void mobilityRepeater(std::string name, wifiSchema& schema, int mobility[4]);
 	void p2pBuilder(KeyPair, flowSchema, int, NodesTuple &, NodesTuple &);
 	void csmaBuilder(KeyPair, flowSchema, NodesTuple &, NodesTuple &);
-	void wifiBuilder(KeyPair, wifiSchema, NodesTuple &, NodesTuple &);
+	void wifiBuilder(KeyPair, wifiSchema, int, NodesTuple &, NodesTuple &);
 }
 
 #endif

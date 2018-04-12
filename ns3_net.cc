@@ -92,6 +92,15 @@ void findMemberName(Value const *doc, const std::string name, StringVector &outp
 	}
 }
 
+void expandMobilityArray(Value &doc, int arr[])
+{
+	auto tmp = doc.GetArray();
+	for(size_t it=0;it!=tmp.Capacity();++it)
+	{
+		arr[it] = tmp[it].GetInt();
+	}
+}
+
 using namespace ns3_net;
 static int random_counter = 0;
 map<string, NS3Link> NS3LinkMap=
@@ -261,6 +270,7 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 		// Get Link Name
 		auto link_type = v.GetString();
 		assert(links.HasMember(link_type));
+		int mobility[4];
 		flowSchema ftmp;
 		wifiSchema wtmp;
 
@@ -279,6 +289,7 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 					.throughput = link_templ["throughput"].GetString(),
 					.delay		= link_templ["delay"].GetString()
 				};
+
 				HierPrint(G_T("-->|P2P|"), "inlined");
 				printf(G_T(" (%s, %s)\n"), ftmp.throughput, ftmp.delay);
 				p2pBuilder(key_pair, ftmp, index, this->group, child->group);
@@ -288,6 +299,7 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 					.throughput = link_templ["throughput"].GetString(),
 					.delay		= link_templ["delay"].GetString()
 				};
+
 				HierPrint(G_T("-->|CSMA|"), "inlined");
 				printf(G_T(" (%s, %s)\n"), ftmp.throughput, ftmp.delay);
 				csmaBuilder(key_pair, ftmp, this->group, child->group);
@@ -296,14 +308,17 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 				wtmp = {
 					.ssid 		= string(link_templ["ssid"].GetString()),
 					.standard 	= string(link_templ["standard"].GetString()), //IEEE 802.11
-					.mobility	= {0,5,0,0},
+					.mobility	= {0,0,0,0},
 					.channel	= link_templ["channel"].GetInt(),
 					.bandwidth	= link_templ["bandwidth"].GetInt()
 				};
-				wtmp.ssid = regex_replace(wtmp.ssid, regex("%[^ ]*%"), to_string(++random_counter));	
+				wtmp.ssid = regex_replace(wtmp.ssid, regex("%[^ ]*%"), to_string(++random_counter));
+				expandMobilityArray(link_templ["mobility"], mobility);
+				mobilityRepeater(templ_name, wtmp, mobility);
+
 				HierPrint(G_T("-->|WiFi|"), "inlined");
 				printf(G_T(" (%s, Channel: %d)\n"), wtmp.ssid.c_str(), wtmp.channel);
-				wifiBuilder(key_pair, wtmp, this->group, child->group);
+				wifiBuilder(key_pair, wtmp, index, this->group, child->group);
 				break;
 			default:
 				sprintf(build_log, "not supported link: %s", link_type);
