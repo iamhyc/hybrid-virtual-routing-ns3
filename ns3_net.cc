@@ -281,7 +281,7 @@ void NetRootTree::expand_links(Value &links, int index, char const *child_name, 
 				};
 				HierPrint(G_T("-->|P2P|"), "inlined");
 				printf(G_T(" (%s, %s)\n"), ftmp.throughput, ftmp.delay);
-				p2pBuilder(key_pair, ftmp, this->group, child->group);
+				p2pBuilder(key_pair, ftmp, index, this->group, child->group);
 				break;
 			case NS3Link::CSMA:
 				ftmp = {
