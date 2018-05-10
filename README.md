@@ -30,7 +30,7 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 
 ### Howto
 
-1. build ns3 following official course;
+1. build `ns3` following official tutorial;
 
 2. `ln -s <this-repo-full-path> <your-ns3-full-path>/examples/main`
 
@@ -39,7 +39,7 @@ hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
    ```shell
    # Waf section
    WAF_PATH=<your-ns3-full-path>
-   WAF_EDITOR=<your-prefer-editor>
+   WAF_EDITOR=<your-prefered-editor>
    export PATH=$WAF_PATH:$PATH
 
    function wafls() {
