@@ -176,7 +176,7 @@ void NetRootTree::construct()
 	{
 		expand_children(strs);
 	}
-	findMemberName(this->topology, "inter", strs); //TODO:ass inter link
+	findMemberName(this->topology, "inter", strs); //TODO:add inter link
 	findMemberName(this->topology, "outer", strs); //TODO:add outer link callback
 }
 
