@@ -2,6 +2,8 @@
 
 hybrid-virtual-routing, for VLC-RF Backended Wi-Fi Relay Network
 
+Tech-Tag: `ns3` `rapidjson` `root-tree`
+
 ### Framework
 
 * describe the network from-top-to-bottom in JSON format, self-recursive and iterable
